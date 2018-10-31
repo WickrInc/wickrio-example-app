@@ -1,6 +1,6 @@
 {
   "name": "wickrio-example-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WickrIO Node.js API example app",
   "main": "example_app.js",
   "dependencies": {
@@ -11,5 +11,9 @@
   "scripts": {
     "start": "pm2 start example_app.js",
     "stop": "pm2 delete example_app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WickrInc/wickrio-example-app"
   }
 }
