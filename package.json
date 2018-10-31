@@ -1,0 +1,15 @@
+{
+  "name": "wickrio-example-app",
+  "version": "1.0.0",
+  "description": "WickrIO Node.js API example app",
+  "main": "example_app.js",
+  "dependencies": {
+    "pm2": "^3.2.2",
+    "prompt": "^1.0.0",
+    "wickrio_addon": "^4.62.7"
+  },
+  "scripts": {
+    "start": "pm2 start example_app.js",
+    "stop": "pm2 delete example_app.js"
+  }
+}
