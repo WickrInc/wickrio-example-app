@@ -9,7 +9,7 @@
     "wickrio_addon": "^4.64.2"
   },
   "scripts": {
-    "start": "pm2 start example_app.js",
+    "start": "pm2 start example_app.js --update-env",
     "stop": "pm2 delete example_app.js"
   },
   "repository": {

@@ -57,7 +57,8 @@ return new Promise(async (resolve, reject) => {
       resolve(response);
     }
   } catch (err) {
-    return console.log(err);
+    console.log(err);
+    process.exit();
   }
 }).then(result => {
   console.log(result);
@@ -70,6 +71,7 @@ return new Promise(async (resolve, reject) => {
     addon.cmdStartAsyncRecvMessages(listen); //Passes a callback function that will receive incoming messages into the bot client
   } catch (err) {
     console.log(err);
+    process.exit();
   }
 
   function listen(message) {
@@ -80,7 +82,7 @@ return new Promise(async (resolve, reject) => {
     var argument = parsedMessage.argument;
     var vGroupID = parsedMessage.vgroupid;
     var message = "Hi, what can I help you with?";
-    
+
     if (command === '/help') {
       try {
         var sMessage = addon.cmdSendRoomMessage(vGroupID, message); //Respond back to the user with a message
