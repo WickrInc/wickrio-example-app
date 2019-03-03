@@ -1,16 +1,17 @@
 {
   "name": "wickrio-example-app",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "WickrIO Node.js API example app",
-  "main": "example_app.js",
+  "main": "example-app.js",
   "dependencies": {
-    "pm2": "^3.2.2",
+    "pm2": "^3.3.1",
     "prompt": "^1.0.0",
-    "wickrio_addon": "^4.64.2"
+    "wickrio-bot-api": "1.0.0",
+    "wickrio_addon": "5.8.2"
   },
   "scripts": {
-    "start": "pm2 start example_app.js",
-    "stop": "pm2 delete example_app.js"
+    "start": "pm2 start processes.json --update-env",
+    "stop": "pm2 delete processes.json"
   },
   "repository": {
     "type": "git",

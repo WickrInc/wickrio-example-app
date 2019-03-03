@@ -1,2 +1,2 @@
 #!/bin/sh
-npm install
+npm install --unsafe-perm
