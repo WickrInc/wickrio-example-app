@@ -4,10 +4,10 @@
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {
-    "pm2": "^3.3.1",
+    "pm2": "^3.4.1",
     "prompt": "^1.0.0",
     "wickrio-bot-api": "1.0.0",
-    "wickrio_addon": "5.8.2"
+    "wickrio_addon": "5.12.4"
   },
   "scripts": {
     "start": "pm2 start processes.json --update-env",
