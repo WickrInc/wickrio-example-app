@@ -8,16 +8,20 @@ var bot, tokens, bot_username, bot_client_port, bot_client_server;
 var tokens = JSON.parse(process.env.tokens);
 
 async function exitHandler(options, err) {
-  var closed = await bot.close();
-  console.log(closed);
-  if (err) {
-    console.log("Exit Error:", err);
-    process.exit();
-  }
-  if (options.exit) {
-    process.exit();
-  } else if (options.pid) {
-    process.kill(process.pid);
+  try {
+    var closed = await bot.close();
+    console.log(closed);
+    if (err) {
+      console.log("Exit Error:", err);
+      process.exit();
+    }
+    if (options.exit) {
+      process.exit();
+    } else if (options.pid) {
+      process.kill(process.pid);
+    }
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -50,11 +54,12 @@ async function main() {
       bot = new WickrIOBotAPI.WickrIOBot();
       status = await bot.start(process.argv[2])
     }
-    if (!status)
+    if (!status) {
       exitHandler(null, {
         exit: true,
         reason: 'Client not able to start'
       });
+    }
     ///////////////////////
     //Start coding below
     ///////////////////////
