@@ -15,7 +15,6 @@ process.stdin.resume(); //so the program will not close instantly
 function exitHandler(options, err) {
   try {
     if (err) {
-      console.log('Exit error:', err);
       process.kill(process.pid);
       process.exit();
     }
@@ -60,7 +59,7 @@ async function main() {
 }
 
 async function inputTokens() {
-  var tokens = ['BOT_USERNAME']; //Add any tokens(as strings separated by commas) you want to prompt for in the configuration process here
+  var tokens = []; //Add any tokens(as strings separated by commas) you want to prompt for in the configuration process here
   var config = [];
   var i = 0;
   var inputResult = await readFileInput();
@@ -129,7 +128,14 @@ async function inputTokens() {
     for (var j = 0; j < config.length; j++) {
       newObjectResult[objectKeyArray[j]] = objectValueArray[j];
     }
+    var obj = {
+      "value": process.argv[2],
+      "encrypted": false
+    };
+    newObjectResult.BOT_USERNAME = obj;
     for (var key in newObjectResult) {
+      if (key === 'BOT_USERNAME')
+        continue;
       var obj = {
         "value": newObjectResult[key],
         "encrypted": false
