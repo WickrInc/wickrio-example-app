@@ -4,7 +4,7 @@ const WickrUser = WickrIOBotAPI.WickrUser;
 
 process.stdin.resume(); //so the program will not close instantly
 
-var bot, tokens, bot_username, bot_client_port, bot_client_server;
+var bot, bot_username;
 var tokens = JSON.parse(process.env.tokens);
 
 async function exitHandler(options, err) {
@@ -60,10 +60,11 @@ async function main() {
         reason: 'Client not able to start'
       });
     }
-    ///////////////////////
-    //Start coding below
-    ///////////////////////
     await bot.startListening(listen); //Passes a callback function that will receive incoming messages into the bot client
+    ///////////////////////
+    //Start coding below and modify the listen function to your needs
+    ///////////////////////
+
   } catch (err) {
     console.log(err);
   }
@@ -85,8 +86,10 @@ async function listen(message) {
     var vGroupID = parsedMessage.vgroupid;
     var convoType = parsedMessage.convoType;
     var personal_vGroupID = "";
+
     if (convoType === 'personal')
       personal_vGroupID = vGroupID;
+
     var found = bot.getUser(userEmail); //Look up user by their wickr email
     if (!found) { //Check if a user exists in the database
       wickrUser = new WickrUser(userEmail, {
@@ -96,18 +99,21 @@ async function listen(message) {
         argument: ""
       });
       var added = bot.addUser(wickrUser); //Add a new user to the database
-      console.log(added);
+      var user = bot.getUser(userEmail);
+      console.log('getUser():', user);
+      user.token = "example_token_A1234";
+      console.log(bot.getUser(userEmail)); //Print the changed user object
     }
-    var user = bot.getUser(userEmail);
-    console.log('getUser():', user);
-    user.token = "example_token_A1234";
-    console.log(bot.getUser(userEmail)); //Print the changed user object
+
     //how to determine the command a user sent and handling it
     if (command === '/help') {
       var reply = "What can I help you with?";
+
+      /////to reply back to the user privately uncomment the following 2 lines
+      // var users = [userEmail];
+      // var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply); //Respond back to the user(using user wickrEmail)
+
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply); //Respond back to the user or room with a message(using vGroupID)
-      var users = [userEmail];
-      var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply); //Respond back to the user(using user wickrEmail)
       console.log(sMessage);
     }
   } catch (err) {

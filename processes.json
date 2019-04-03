@@ -2,9 +2,9 @@
   "apps": [{
     "name": "WickrIO-Example-App",
     "args": [],
-    "script": "node example_app.js",
+    "script": "node example-app.js",
     "exec_interpreter": "none",
-    "autorestart": true,
+    "autorestart": false,
     "watch": [
       "package.json"
     ],
