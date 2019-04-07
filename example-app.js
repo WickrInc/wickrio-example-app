@@ -1,21 +1,15 @@
 const WickrIOAPI = require('wickrio_addon');
 const WickrIOBotAPI = require('wickrio-bot-api');
 const WickrUser = WickrIOBotAPI.WickrUser;
+const bot = new WickrIOBotAPI.WickrIOBot();
 
 process.stdin.resume(); //so the program will not close instantly
-
-var bot, bot_username;
-var tokens = JSON.parse(process.env.tokens);
 
 async function exitHandler(options, err) {
   try {
     var closed = await bot.close();
-    console.log(closed);
-    if (err) {
-      console.log("Exit Error:", err);
-      process.exit();
-    }
-    if (options.exit) {
+    if (err || options.exit) {
+      console.log("Exit reason:", err);
       process.exit();
     } else if (options.pid) {
       process.kill(process.pid);
@@ -45,13 +39,11 @@ process.on('uncaughtException', exitHandler.bind(null, {
 
 async function main() {
   try {
+    var tokens = JSON.parse(process.env.tokens);
     var status;
     if (process.argv[2] === undefined) {
-      bot_username = tokens.BOT_USERNAME.value;
-      bot = new WickrIOBotAPI.WickrIOBot();
-      status = await bot.start(bot_username)
+      status = await bot.start(tokens.BOT_USERNAME.value)
     } else {
-      bot = new WickrIOBotAPI.WickrIOBot();
       status = await bot.start(process.argv[2])
     }
     if (!status) {

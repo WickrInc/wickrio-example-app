@@ -3,6 +3,7 @@ An easy to get started Wickr IO API Example integration template
 
 ## Description:
 Shows the basic code needed to get started writing a Wickr IO API integration
+* Note: This is a good template to edit and create a custom integration for Wickr
 
 ## Configuration:
 Wickr IO integrations are configured by running the configure.sh file,
