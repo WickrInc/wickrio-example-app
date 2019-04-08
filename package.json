@@ -1,6 +1,6 @@
 {
   "name": "wickrio-example-app",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {
@@ -17,5 +17,15 @@
     "type": "git",
     "url": "https://github.com/WickrInc/wickrio-example-app"
   },
+  "keywords": [
+    "wickr",
+    "wickrio",
+    "wickrbot",
+    "bot",
+    "bots",
+    "secure",
+    "messaging",
+    "api"
+  ],
   "database": true
 }
