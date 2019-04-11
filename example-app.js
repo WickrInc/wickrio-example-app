@@ -63,7 +63,7 @@ async function main() {
 }
 
 
-async function listen(message) {
+function listen(message) {
   try {
     var parsedMessage = bot.parseMessage(message); //Parses an incoming message and returns and object with command, argument, vGroupID and Sender fields
     if (!parsedMessage) {
@@ -100,11 +100,9 @@ async function listen(message) {
     //how to determine the command a user sent and handling it
     if (command === '/help') {
       var reply = "What can I help you with?";
-
       /////to reply back to the user privately uncomment the following 2 lines
       // var users = [userEmail];
       // var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply); //Respond back to the user(using user wickrEmail)
-
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply); //Respond back to the user or room with a message(using vGroupID)
       console.log(sMessage);
     }
