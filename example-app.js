@@ -83,16 +83,15 @@ function listen(message) {
       personal_vGroupID = vGroupID;
 
     var found = bot.getUser(userEmail); //Look up user by their wickr email
-    if (!found) { //Check if a user exists in the database
+    if (found === undefined) { //Check if a user exists in the database
       wickrUser = new WickrUser(userEmail, {
         index: 0,
         personal_vGroupID: personal_vGroupID,
         command: "",
         argument: ""
       });
-      var added = bot.addUser(wickrUser); //Add a new user to the database
-      var user = bot.getUser(userEmail);
-      console.log('getUser():', user);
+      var user = bot.addUser(wickrUser); //Add a new user to the database
+      console.log('Added user:', user);
       user.token = "example_token_A1234";
       console.log(bot.getUser(userEmail)); //Print the changed user object
     }
