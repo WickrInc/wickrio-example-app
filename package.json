@@ -1,13 +1,13 @@
 {
   "name": "wickrio-example-app",
-  "version": "1.1.5",
+  "version": "5.44.2",
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {
     "pm2": "^3.5.1",
     "prompt": "^1.0.0",
-    "wickrio-bot-api": "1.1.0",
-    "wickrio_addon": "5.30.5"
+    "wickrio-bot-api": "5.44.2",
+    "wickrio_addon": "5.44.2"
   },
   "scripts": {
     "start": "pm2 start processes.json --update-env",
