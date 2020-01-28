@@ -147,6 +147,15 @@ async function inputTokens() {
     }
     try {
       var cp = execSync('cp processes.json processes_backup.json');
+
+      if (newObjectResult.BOT_USERNAME !== undefined && 
+          newObjectResult.BOT_USERNAME.value !== undefined) {
+        var newName = "WickrIO-Example-App_" + newObjectResult.BOT_USERNAME.value;
+      } else {
+        var newName = "WickrIO-Example-App";
+      }
+      dataParsed.apps[0].name = newName;
+
       var assign = Object.assign(dataParsed.apps[0].env.tokens, newObjectResult);
       var ps = fs.writeFileSync('./processes.json', JSON.stringify(dataParsed, null, 2));
     } catch (err) {
