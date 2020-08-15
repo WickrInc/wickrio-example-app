@@ -1,31 +1,66 @@
 {
-  "name": "wickrio-example-app",
-  "version": "5.47.4",
-  "description": "WickrIO Node.js API example app",
-  "main": "example-app.js",
-  "dependencies": {
-    "pm2": "^3.5.1",
-    "prompt": "^1.0.0",
-    "wickrio-bot-api": "5.44.x",
-    "wickrio_addon": "5.44.x"
-  },
-  "scripts": {
-    "start": "pm2 start processes.json --update-env",
-    "stop": "pm2 delete processes.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/WickrInc/wickrio-example-app"
-  },
-  "keywords": [
-    "wickr",
-    "wickrio",
-    "wickrbot",
-    "bot",
-    "bots",
-    "secure",
-    "messaging",
-    "api"
-  ],
-  "database": true
+	"name": "wickrio-example-app",
+	"version": "5.62.3",
+	"description": "WickrIO Node.js API example app",
+	"main": "./build/index.js",
+	"dependencies": {
+		"@babel/cli": "^7.8.4",
+		"@babel/core": "^7.9.6",
+		"@babel/preset-env": "^7.9.6",
+		"pm2": "^3.5.1",
+		"prompt": "^1.0.0",
+		"wickrio-bot-api": "5.62.x",
+		"wickrio_addon": "5.60.x"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.10.4",
+		"@babel/core": "^7.10.4",
+		"@babel/node": "^7.10.5",
+		"@babel/plugin-proposal-class-properties": "^7.10.4",
+		"@babel/plugin-proposal-optional-chaining": "^7.10.4",
+		"@babel/plugin-transform-modules-commonjs": "^7.10.4",
+		"@babel/plugin-transform-runtime": "^7.10.4",
+		"@babel/preset-env": "^7.10.4",
+		"@babel/register": "^7.10.4",
+		"babel-eslint": "^10.1.0",
+		"babel-jest": "^26.1.0",
+		"eslint": "^7.4.0",
+		"eslint-config-prettier": "^6.11.0",
+		"eslint-config-standard": "^14.1.1",
+		"eslint-plugin-import": "^2.22.0",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^3.1.4",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-standard": "^4.0.1",
+		"husky": "^4.2.5",
+		"jest": "^26.1.0",
+		"lint-staged": "^10.2.11",
+		"nodemon": "^2.0.4",
+		"pino-pretty": "^3.5.0",
+		"prettier": "2.0.5",
+		"supertest": "^4.0.2"
+	},
+	"scripts": {
+		"start": "pm2 start processes.json --update-env",
+		"dev": "nodemon --exec 'babel-node --inspect=0.0.0.0 src/index.js'",
+		"build": "rm -rf build && ./node_modules/.bin/babel ./src --out-dir ./build --ignore node_modules",
+		"lint": "eslint src/**/*.js --fix --color",
+		"prettier": "prettier --write ./src/*",
+		"stop": "pm2 delete processes.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WickrInc/wickrio-example-app"
+	},
+	"keywords": [
+		"wickr",
+		"wickrio",
+		"wickrbot",
+		"bot",
+		"bots",
+		"secure",
+		"messaging",
+		"api"
+	],
+	"database": true
 }
