@@ -4,9 +4,6 @@
 	"description": "WickrIO Node.js API example app",
 	"main": "./build/index.js",
 	"dependencies": {
-		"@babel/cli": "^7.8.4",
-		"@babel/core": "^7.9.6",
-		"@babel/preset-env": "^7.9.6",
 		"pm2": "^3.5.1",
 		"prompt": "^1.0.0",
 		"wickrio-bot-api": "5.62.x",
