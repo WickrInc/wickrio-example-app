@@ -6,7 +6,7 @@
   "dependencies": {
     "pm2": "^3.5.1",
     "prompt": "^1.0.0",
-    "wickrio-bot-api": "5.44.x",
+    "wickrio-bot-api": "5.64.x",
     "wickrio_addon": "5.44.x"
   },
   "scripts": {
