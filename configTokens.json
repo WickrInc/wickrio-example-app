@@ -1,0 +1,16 @@
+{
+    "supportAdministrators":false,
+    "supportVerification":false,
+    "integration":"WickrIO-Example-App",
+    "tokens":[
+        {
+            "token":"DATABASE_ENCRYPTION_KEY",
+            "pattern":"",
+            "type":"string",
+            "description":"Enter your Database Encryption Key",
+            "message":"Cannot leave DATABASE_ENCRYPTION_KEY empty! Please enter a value",
+            "required":true,
+            "default":"N/A"
+        }
+    ]
+}
