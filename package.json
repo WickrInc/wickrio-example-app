@@ -1,6 +1,6 @@
 {
   "name": "wickrio-example-app",
-  "version": "5.64.1",
+  "version": "5.68.1",
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {

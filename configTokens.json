@@ -1,0 +1,6 @@
+{
+    "supportAdministrators":false,
+    "supportVerification":false,
+    "integration":"WickrIO-Example-App",
+    "tokens":[]
+}
