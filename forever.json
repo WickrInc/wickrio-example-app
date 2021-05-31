@@ -1,0 +1,10 @@
+{
+  "uid": "wickrio-example-app",
+  "append": true,
+  "watch": false,
+  "script": "./example-app.js",
+  "sourceDir": "",
+  "logFile": "",
+  "outFile": "",
+  "errFile": ""
+}
