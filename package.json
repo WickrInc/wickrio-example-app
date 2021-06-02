@@ -1,6 +1,6 @@
 {
   "name": "wickrio-example-app",
-  "version": "5.82.1",
+  "version": "5.82.2",
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {
@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "forever start -m 5 ./forever.json",
-    "stop": "forever stopall",
-    "restart": "forever restartall"
+    "stop": "forever stop wickrio-example-app",
+    "restart": "forever restart wickrio-example-app"
   },
   "repository": {
     "type": "git",
