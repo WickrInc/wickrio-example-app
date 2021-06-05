@@ -116,6 +116,121 @@ function listen(message) {
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply); //Respond back to the user or room with a message(using vGroupID)
       console.log(sMessage);
     }
+    else if (command === '/list') {
+      let reply = ''
+      const header = 'List of commands'
+      reply = header + '\n/help\n/list\n/dm\n'
+      let messagemeta = {
+        table: {
+          name: header,
+          firstcolname: 'Command',
+          actioncolname: 'Select',
+          rows: [
+            {
+              firstcolvalue: '/help to get help',
+              response: '/help',
+            },
+            {
+              firstcolvalue: '/list to get a list',
+              response: '/list',
+            },
+            {
+              firstcolvalue: '/dm to do a Direct Message',
+              response: '/dm',
+            },
+            {
+              firstcolvalue: '/button to do a Button Message',
+              response: '/button',
+            },
+          ],
+        },
+        textcut: [
+          {
+            startindex: header.length,
+            endindex: reply.length,
+          },
+        ],
+      }
+
+      const messagemetastring = JSON.stringify(messagemeta)
+      console.log('messageMetaString=', messagemetastring)
+
+      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
+    }
+    else if (command === '/dm') {
+      if (argument === undefined || argument === '') {
+        const secGroupUsers = WickrIOAPI.cmdGetDirectory('0', '100');
+        console.log('directory=', secGroupUsers)
+
+        const secGroupUsersArray = JSON.parse(secGroupUsers)
+        if (secGroupUsersArray.length === 0) {
+          const sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, 'Please include a user to dm');
+        } else {
+          const header = 'Select user to /dm with'
+          const reply = header
+          let messagemeta = {
+            table: {
+              name: header,
+              firstcolname: 'User',
+              actioncolname: 'Select',
+              rows: [],
+            },
+            textcut: []
+          }
+
+          secGroupUsersArray.forEach(entry => {
+            if (entry.is_bot !== true) {
+              // Create entry in table
+              const row = {
+                firstcolvalue: entry.name,
+                response: '/dm ' + entry.name,
+              }
+              messagemeta.table.rows.push(row)
+            }
+          })
+          const messagemetastring = JSON.stringify(messagemeta)
+          console.log('messageMetaString=', messagemetastring)
+
+          const sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
+        }
+      } else {
+        const reply = 'this is a /dm response to ' + argument
+        const messagemeta = {
+          buttons: [
+            {
+              type: 'dm',
+              messagetosend: '/ack',
+              messagetodm: 'Hello there',
+              userid: argument,
+            },
+          ],
+        }
+        const messagemetastring = JSON.stringify(messagemeta)
+        console.log('messageMetaString=', messagemetastring)
+
+        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
+      }
+    }
+    else if (command === '/button') {
+      const reply = 'this is a /button response'
+      const messagemeta = {
+        buttons: [
+          {
+            type: 'message',
+            text: '/help',
+            message: '/help',
+          },
+          {
+            type: 'getlocation',
+            text: '/Ack with Location',
+          },
+        ],
+      }
+      const messagemetastring = JSON.stringify(messagemeta)
+      console.log('messageMetaString=', messagemetastring)
+
+      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring); //Respond back to the user or room with a message(using vGroupID)
+    }
   } catch (err) {
     console.log(err);
   }
