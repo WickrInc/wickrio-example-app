@@ -195,10 +195,12 @@ function listen(message) {
         }
       } else {
         const reply = 'this is a /dm response to ' + argument
+        const btntext = 'DM ' + argument
         const messagemeta = {
           buttons: [
             {
               type: 'dm',
+              text: btntext,
               messagetosend: '/ack',
               messagetodm: 'Hello there',
               userid: argument,
