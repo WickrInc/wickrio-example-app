@@ -159,7 +159,9 @@ function listen(message) {
     }
     else if (command === '/dm') {
       if (argument === undefined || argument === '') {
-        const secGroupUsers = WickrIOAPI.cmdGetDirectory('0', '100');
+        const sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, 'Getting list of users in your network, may take some time.');
+
+        const secGroupUsers = WickrIOAPI.cmdGetDirectory('0', '200');
         console.log('directory=', secGroupUsers)
 
         const secGroupUsersArray = JSON.parse(secGroupUsers)
