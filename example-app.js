@@ -221,12 +221,23 @@ function listen(message) {
         buttons: [
           {
             type: 'message',
-            text: '/help',
+            text: 'Help',
             message: '/help',
+            preferred: 'true',
           },
           {
             type: 'getlocation',
-            text: '/Ack with Location',
+            text: 'Location',
+          },
+          {
+            type: 'message',
+            text: 'Buttons',
+            message: '/button',
+          },
+          {
+            type: 'message',
+            text: 'DM',
+            message: '/dm',
           },
         ],
       }
