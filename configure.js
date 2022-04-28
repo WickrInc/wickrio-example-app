@@ -59,7 +59,7 @@ async function main() {
 }
 
 async function inputTokens() {
-  var tokens = ['DATABASE_ENCRYPTION_KEY']; //Add any tokens(as strings separated by commas) you want to prompt for in the configuration process here
+  var tokens = []; //Add any tokens(as strings separated by commas) you want to prompt for in the configuration process here
   var config = [];
   var i = 0;
   var inputResult = await readFileInput();
