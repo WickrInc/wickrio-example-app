@@ -3,7 +3,8 @@ const WickrIOBotAPI = require('wickrio-bot-api');
 const WickrUser = WickrIOBotAPI.WickrUser;
 const bot = new WickrIOBotAPI.WickrIOBot();
 
-process.stdin.resume(); //so the program will not close instantly
+//so the program will not close instantly
+process.stdin.resume();
 
 async function exitHandler(options, err) {
   try {
@@ -63,10 +64,10 @@ async function main() {
         reason: 'Client not able to start'
       });
     }
-    await bot.startListening(listen); //Passes a callback function that will receive incoming messages into the bot client
-    ///////////////////////
-    //Start coding below and modify the listen function to your needs
-    ///////////////////////
+
+    // The following call passes a callback function to the bot API. 
+    // The listen function will be called for each message received.
+    await bot.startListening(listen);
 
   } catch (err) {
     console.log(err);
@@ -76,7 +77,9 @@ async function main() {
 
 function listen(message) {
   try {
-    var parsedMessage = bot.parseMessage(message); //Parses an incoming message and returns and object with command, argument, vGroupID and Sender fields
+    // The parseMessage() function will parse the incoming message and
+    // returns and object with command, argument, vGroupID and Sender fields
+    var parsedMessage = bot.parseMessage(message);
     if (!parsedMessage) {
       return;
     }
@@ -93,29 +96,51 @@ function listen(message) {
     if (convoType === 'personal')
       personal_vGroupID = vGroupID;
 
-    var found = bot.getUser(userEmail); //Look up user by their wickr email
-    if (found === undefined) { //Check if a user exists in the database
+    // Look up user by their wickr username
+    var found = bot.getUser(userEmail);
+    //Check if a user exists in the database
+    if (found === undefined) {
       wickrUser = new WickrUser(userEmail, {
         index: 0,
         personal_vGroupID: personal_vGroupID,
         command: "",
         argument: ""
       });
-      var user = bot.addUser(wickrUser); //Add a new user to the database
+      //Add a new user to the database
+      var user = bot.addUser(wickrUser);
       console.log('Added user:', user);
       user.token = "example_token_A1234";
-      console.log(bot.getUser(userEmail)); //Print the changed user object
+      //Print the changed user object
+      console.log(bot.getUser(userEmail));
     }
 
-    //how to determine the command a user sent and handling it
+
+    // WickrIO bot commands are proceeded by the '/' (slash) character
+
+    /*
+     * Process the 'help' command
+     *
+     * Send a sample help message back to the user, using the vGroupID that
+     * the help command was received on.  This vGroupID could be for a DM or
+     * it could be a Room convo.
+     */
     if (command === '/help') {
       var reply = "What can I help you with?";
-      /////to reply back to the user privately uncomment the following 2 lines
+
+      // if you want to reply back to the user privately uncomment the following 2 lines
       // var users = [userEmail];
-      // var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply); //Respond back to the user(using user wickrEmail)
-      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply); //Respond back to the user or room with a message(using vGroupID)
+      // var sMessage = WickrIOAPI.cmdSend1to1Message(users, reply);
+
+      //Respond back to the user or room with a message(using vGroupID)
+      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply);
+
       console.log(sMessage);
     }
+    /*
+     * Process the 'list' command
+     *
+     * A response will be sent with that contains a list of choices
+     */
     else if (command === '/list') {
       let reply = ''
       const header = 'List of commands'
@@ -157,7 +182,19 @@ function listen(message) {
 
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
     }
+    /*
+     * Process the '/dm' command (aka Direct Message)
+     *
+     * This command will retrieve the list of Wickr users in your network,
+     * generate a list of those users.  This list will be sent as a response.
+     * When you select one of those users it will respond back to you with a
+     * 'dm' button.  When you click on that button the client will open a DM
+     * convo with that user.
+     */
     else if (command === '/dm') {
+      /*
+       * If there are no arguments then respond with the list of users in this network
+       */
       if (argument === undefined || argument === '') {
         const sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, 'Getting list of users in your network, may take some time.');
 
@@ -195,7 +232,12 @@ function listen(message) {
 
           const sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
         }
-      } else {
+      }
+      /*
+       * Else the command has an argument that should be a wickr user.
+       * Send a response that contains a DM button 
+       */
+      else {
         const reply = 'this is a /dm response to ' + argument
         const btntext = 'DM ' + argument
         const messagemeta = {
@@ -215,6 +257,11 @@ function listen(message) {
         var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
       }
     }
+    /*
+     * Process the '/button' command
+     *
+     * Responds with several buttons, of the different button types.
+     */
     else if (command === '/button') {
       const reply = 'this is a /button response'
       const messagemeta = {
@@ -244,7 +291,8 @@ function listen(message) {
       const messagemetastring = JSON.stringify(messagemeta)
       console.log('messageMetaString=', messagemetastring)
 
-      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring); //Respond back to the user or room with a message(using vGroupID)
+      //Respond back to the user or room with a message(using vGroupID)
+      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
     }
   } catch (err) {
     console.log(err);
