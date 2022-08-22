@@ -1,7 +1,13 @@
+const fs = require('fs')
+const path = require('path')
+
 const WickrIOAPI = require('wickrio_addon');
 const WickrIOBotAPI = require('wickrio-bot-api');
 const WickrUser = WickrIOBotAPI.WickrUser;
 const bot = new WickrIOBotAPI.WickrIOBot();
+
+var bot_username
+var output_filename
 
 //so the program will not close instantly
 process.stdin.resume();
@@ -74,6 +80,1139 @@ async function main() {
   }
 }
 
+function outputtestmessage(message) {
+    if (output_filename) {
+    } else {
+        console.log(message)
+    }
+}
+
+function testapis(filename) {
+    var fd = fs.openSync(filename, 'w')
+    fs.writeSync(fd, "Starting to run WickrIO Addon API tests\n")
+
+    var num_success = 0
+    var num_failure = 0
+    var num_cantrun = 0
+    var num_notcoded = 0
+
+    // clientInit
+    // This was done when the bot started, not testable
+
+    // closeClient
+    // isConnected
+
+    // getClientState
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.getClientState()
+	if (result) {
+            fs.writeSync(fd, 'getClientState: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'getClientState: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'getClientState: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdStartAsyncRecvMessages
+    num_notcoded++
+    // cmdStopAsyncRecvMessages
+    num_notcoded++
+
+    // cmdSetMsgCallback
+    const msgCallbackURL="https://msgCallback"
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdSetMsgCallback(msgCallbackURL)
+	if (result) {
+            fs.writeSync(fd, 'cmdSetMsgCallback: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdSetMsgCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSetMsgCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetMsgCallback
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdGetMsgCallback()
+	if (result) {
+            const response = isJson(result)
+	    if (response !== false && response.callback === msgCallbackURL) {
+                fs.writeSync(fd, 'cmdGetMsgCallback: success: ' + result + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdGetMsgCallback: failed: returned different value from what was set: ' + result + '\n')
+                num_failure++
+	    }
+	} else {
+            fs.writeSync(fd, 'cmdGetMsgCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetMsgCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDeleteMsgCallback
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdDeleteMsgCallback()
+	if (result) {
+            fs.writeSync(fd, 'cmdDeleteMsgCallback: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdDeleteMsgCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdDeleteMsgCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdSetEventCallback
+    const eventCallbackURL="https://eventCallback"
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdSetEventCallback(eventCallbackURL)
+	if (result) {
+            fs.writeSync(fd, 'cmdSetEventCallback: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdSetEventCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSetEventCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetEventCallback
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdGetEventCallback()
+	if (result) {
+            const response = isJson(result)
+	    if ((response !== false) && (response.callback === eventCallbackURL)) {
+                fs.writeSync(fd, 'cmdGetEventCallback: success: ' + result + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdGetEventCallback: failed: returned different value from what was set: ' + result + '\n')
+                num_failure++
+	    }
+	} else {
+            fs.writeSync(fd, 'cmdGetEventCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetEventCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDeleteEventCallback
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdDeleteEventCallback()
+	if (result) {
+            fs.writeSync(fd, 'cmdDeleteEventCallback: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdDeleteEventCallback: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdDeleteEventCallback: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdPostEvent
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdPostEvent("This is a test event, please disregard.")
+	if (result) {
+            fs.writeSync(fd, 'cmdPostEvent: success: ' + result + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdPostEvent: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdPostEvent: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetDirectory
+    fs.writeSync(fd, "**********************************************************\n")
+    // Global variable that can be used by following tests
+    var directoryUsers = undefined
+    try {
+        var directory = WickrIOAPI.cmdGetDirectory('0', '100')
+	if (directory) {
+            directoryUsers = isJson(directory)
+            fs.writeSync(fd, 'cmdGetDirectory: first 10 users:\n')
+            fs.writeSync(fd, 'cmdGetDirectory: success: ' + directory + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetDirectory: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetDirectory: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetSecurityGroups
+    fs.writeSync(fd, "**********************************************************\n")
+    // Global variable that can be used by following tests
+    var securityGroups = undefined
+    try {
+        var security = WickrIOAPI.cmdGetSecurityGroups()
+	if (security) {
+            securityGroups = isJson(security)
+            fs.writeSync(fd, 'cmdGetSecurityGroups: success: ' + security + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetSecurityGroups: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetSecurityGroups: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetSecurityGroupDirectory
+    fs.writeSync(fd, "**********************************************************\n")
+    if (securityGroups === undefined) {
+        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroups list is indefined!\n')
+        num_cantrun++
+    } else if (securityGroups.size === 0) {
+        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroups list is empty!\n')
+        num_cantrun++
+    } else {
+        try {
+            const securityGroup = securityGroups[0].id
+            if (securityGroup === undefined) {
+                fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroup is undefined!\n')
+                num_failure++
+	    } else {
+                var securityGroupUsers = WickrIOAPI.cmdGetSecurityGroupDirectory(securityGroup, '0', '10')
+	        if (securityGroupUsers) {
+                    users = isJson(securityGroupUsers)
+		    if (users.length > 10) {
+                        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: failed: returned list with too many entries!\n')
+                        num_failure++
+		    } else {
+		        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: first 10 users:\n')
+                        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: success: ' + securityGroupUsers + '\n')
+                        num_success++
+		    }
+	        } else {
+                    fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: failed: returned empty list\n')
+                    num_failure++
+	        }
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: failed: ' + err + '\n')
+            num_failure++
+        }
+    }
+
+    // cmdGetStatistics
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var statistics = WickrIOAPI.cmdGetStatistics()
+        var response = isJson(statistics)
+        fs.writeSync(fd, 'cmdGetStatistics: success: ' + statistics + '\n')
+        num_success++
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetStatistics: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdClearStatistics
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var cleared = WickrIOAPI.cmdClearStatistics()
+        fs.writeSync(fd, "cmdClearStatistics: success: " + cleared + '\n')
+        num_success++
+    } catch (err) {
+        fs.writeSync(fd, 'cmdClearStatistics: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * Room APIs
+     */
+    // We must have a list of users to proceed with these tests!
+    if (!directoryUsers || directoryUsers.length < 2) {
+        fs.writeSync(fd, "**********************************************************\n")
+        fs.writeSync(fd, 'Not enought directory users to run Room tests!\n')
+        num_cantrun += 5
+    } else {
+        // Room value setup
+//        var roomMembers = [bot_username, directoryUsers[0].name ]
+        //var roomModerators = [bot_username, directoryUsers[0].name ]
+        var roomMembers = [bot_username]
+        var roomModerators = [bot_username]
+
+        // cmdAddRoom
+        fs.writeSync(fd, "**********************************************************\n")
+        var roomVGroupID = undefined
+        try {
+            const response  = WickrIOAPI.cmdAddRoom(roomMembers, roomModerators, 'TEST: TestRoom', 'Test Room Description')
+	    if (response) {
+                const result = isJson(response)
+                roomVGroupID = result.vgroupid
+
+                fs.writeSync(fd, "cmdAddRoom: success: " + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdAddRoom: failed:\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdAddRoom: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // cmdGetRoom
+        fs.writeSync(fd, "**********************************************************\n")
+        if (roomVGroupID) {
+            try {
+                const response  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+	        if (response) {
+                    fs.writeSync(fd, "cmdGetRoom: success: " + response + '\n')
+                    num_success++
+	        } else {
+                    fs.writeSync(fd, 'cmdGetRoom: failed: empty value\n')
+                    num_failure++
+	        }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdGetRoom: failed: ' + err + '\n')
+                num_failure++
+            }
+	} else {
+            fs.writeSync(fd, 'cmdGetRoom: room was not added or now VGroupID!\n')
+            num_cantrun++
+	}
+
+        // cmdModifyRoom
+        fs.writeSync(fd, "**********************************************************\n")
+        if (roomVGroupID) {
+            // modify the title and the description
+            try {
+                const newTitle = 'TEST: TestRoomUpdated'
+                const newDescr = 'Test Room Description Updated'
+                const response  = WickrIOAPI.cmdModifyRoom(roomVGroupID, roomMembers, roomModerators, newTitle, newDescr)
+	        if (response) {
+                    const getResponse  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+                    const getResult = isJson(getResponse)
+                    if (getResult.title === newTitle && getResult.description === newDescr) {
+                        fs.writeSync(fd, "cmdModifyRoom: modify title/description success: " + response + '\n')
+                        num_success++
+		    } else {
+                        fs.writeSync(fd, "cmdModifyRoom: didn't change the title/description failed: " + getResponse + '\n')
+                        num_failure++
+		    }
+	        } else {
+                    fs.writeSync(fd, 'cmdModifyRoom: modify title/description failed: empty value\n')
+                    num_failure++
+	        }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdModifyRoom: modify title/description failed: ' + err + '\n')
+                num_failure++
+            }
+
+            const newRoomMembers = [bot_username, directoryUsers[0].name ]
+            const newRoomModerators = [bot_username, directoryUsers[0].name ]
+            try {
+                const response  = WickrIOAPI.cmdModifyRoom(roomVGroupID, newRoomMembers, newRoomModerators, 'TEST: TestRoomUpdated', 'Test Room Description Updated')
+	        if (response) {
+                    const getResponse  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+                    const getResult = isJson(getResponse)
+                    if (getResult.members.length === newRoomMembers.length && getResult.masters.length === newRoomModerators.length) {
+                        fs.writeSync(fd, "cmdModifyRoom: modify members/moderators success: " + response + '\n')
+                        num_success++
+		    } else {
+                        fs.writeSync(fd, "cmdModifyRoom: didn't change the members/moderators failed: " + getResponse + '\n')
+                        num_failure++
+		    }
+	        } else {
+                    fs.writeSync(fd, 'cmdModifyRoom: modify members/moderators failed: empty value\n')
+                    num_failure++
+	        }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdModifyRoom: modify members/moderators failed: ' + err + '\n')
+                num_failure++
+            }
+	} else {
+            fs.writeSync(fd, 'cmdModifyRoom: room was not added or now VGroupID!\n')
+            num_cantrun += 2
+	}
+
+
+        // cmdSendRoomMessage
+        if (!roomVGroupID) {
+            fs.writeSync(fd, "**********************************************************\n")
+            fs.writeSync(fd, 'No VGroupID to send message tests!\n')
+	    console.log('roomVGroupID=' + roomVGroupID)
+            num_cantrun += 3
+        } else {
+            // cmdSendRoomMessage
+            fs.writeSync(fd, "**********************************************************\n")
+            try {
+                const response  = WickrIOAPI.cmdSendRoomMessage(roomVGroupID, "this is a test message for Room convos")
+	        if (response) {
+                    fs.writeSync(fd, "cmdSendRoomMessage: success: " + response + '\n')
+                    num_success++
+	        } else {
+                    fs.writeSync(fd, 'cmdSendRoomMessage: failed:\n')
+                    num_failure++
+	        }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdSendRoomMessage: failed: ' + err + '\n')
+                num_failure++
+            }
+
+            // cmdSendRoomAttachment
+            fs.writeSync(fd, "**********************************************************\n")
+            const attachmentName = path.join(process.cwd(), filename)
+            try {
+                const response  = WickrIOAPI.cmdSendRoomAttachment(roomVGroupID, attachmentName, 'testfile.txt')
+                if (response) {
+                    fs.writeSync(fd, "cmdSendRoomAttachment: success: " + response + '\n')
+                    num_success++
+                } else {
+                    fs.writeSync(fd, 'cmdSendRoomAttachment: failed: empty value\n')
+                    num_failure++
+                }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdSendRoomAttachment: failed: ' + err + '\n')
+                num_failure++
+            }
+        }
+
+        // cmdLeaveRoom
+        num_notcoded++
+    }
+
+    // cmdGetRooms
+    fs.writeSync(fd, "**********************************************************\n")
+    var rooms = undefined
+    try {
+        const response  = WickrIOAPI.cmdGetRooms()
+        rooms = isJson(response)
+        fs.writeSync(fd, "cmdGetRooms: success: " + response + '\n')
+        num_success++
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetRooms: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDeleteRoom
+    fs.writeSync(fd, "**********************************************************\n")
+    var roomDeleteFailed=false
+    if (rooms && rooms.rooms && rooms.rooms.length > 0) {
+        rooms.rooms.forEach(element => {
+            if (element.title.startsWith('TEST:')) {
+		fs.writeSync(fd, "cmdDeleteRoom: trying to delete: " + element.vgroupid + '\n')
+                try {
+                    const response  = WickrIOAPI.cmdDeleteRoom(element.vgroupid)
+                    if (response) {
+                        fs.writeSync(fd, 'cmdDeleteRoom: success\n')
+                    } else {
+                        fs.writeSync(fd, 'cmdDeleteRoom: failed: empty value\n')
+                        roomDeleteFailed=true
+                    }
+                } catch (err) {
+                    fs.writeSync(fd, 'cmdDeleteRoom: failed: ' + err + '\n')
+                    roomDeleteFailed=true
+                }
+	    } else {
+		fs.writeSync(fd, "cmdDeleteRoom: skipping to delete: " + element.vgroupid + '\n')
+	    }
+        });
+        if (roomDeleteFailed) {
+            num_failure++
+	} else {
+            num_success++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdDeleteRoom: there are no rooms to delete!\n')
+        num_cantrun += 2
+    }
+
+
+    // cmdGetGroupConvos
+    fs.writeSync(fd, "**********************************************************\n")
+    var groupConvos = undefined
+    try {
+        const response  = WickrIOAPI.cmdGetGroupConvos()
+	if (response) {
+            groupConvos = isJson(response)
+            fs.writeSync(fd, 'cmdGetGroupConvos: success: ' + response + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetGroupConvos: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetGroupConvos: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDeleteGroupConvo
+    fs.writeSync(fd, "**********************************************************\n")
+    var groupConvoDeleteFailed=false
+    if (groupConvos && groupConvos.groupconvos && groupConvos.groupconvos.length > 0) {
+        groupConvos.groupconvos.forEach(element => {
+            fs.writeSync(fd, "cmdDeleteGroupConvo: trying to delete: " + element.vgroupid + '\n')
+            try {
+                const response  = WickrIOAPI.cmdDeleteGroupConvo(element.vgroupid)
+                if (response) {
+                    fs.writeSync(fd, 'cmdDeleteGroupConvo: success\n')
+                } else {
+                    fs.writeSync(fd, 'cmdDeleteGroupConvo: failed: empty value\n')
+                    groupConvoDeleteFailed=true
+                }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdDeleteGroupConvo: failed: ' + err + '\n')
+                groupConvoDeleteFailed=true
+            }
+        });
+        if (groupConvoDeleteFailed) {
+            num_failure++
+	} else {
+            num_success++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdDeleteGroupConvo: there are no group convos to delete!\n')
+        num_cantrun++
+    }
+
+    // We must have a list of users to proceed with these tests!
+    if (!directoryUsers || directoryUsers.length < 2) {
+        fs.writeSync(fd, "**********************************************************\n")
+        fs.writeSync(fd, 'Not enough directory users to run Group tests!\n')
+        num_cantrun += 3
+    } else {
+        // Group value setup
+        var groupMembers = [bot_username, directoryUsers[0].name ]
+
+        // cmdAddGroupConvo
+        fs.writeSync(fd, "**********************************************************\n")
+        var groupVGroupID = undefined
+        try {
+            const response  = WickrIOAPI.cmdAddGroupConvo(groupMembers)
+	    if (response) {
+                const result = isJson(response)
+                groupVGroupID = result.vgroupid
+
+                fs.writeSync(fd, "cmdAddGroupConvo: success: " + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdAddGroupConvo: failed:\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdAddGroupConvo: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // cmdGetGroupConvo
+        fs.writeSync(fd, "**********************************************************\n")
+        if (groupVGroupID) {
+            try {
+                const response  = WickrIOAPI.cmdGetGroupConvo(groupVGroupID)
+	        if (response) {
+                    fs.writeSync(fd, "cmdGetGroupConvo: success: " + response + '\n')
+                    num_success++
+	        } else {
+                    fs.writeSync(fd, 'cmdGetGroupConvo: failed: empty value\n')
+                    num_failure++
+	        }
+            } catch (err) {
+                fs.writeSync(fd, 'cmdGetGroupConvo: failed: ' + err + '\n')
+                num_failure++
+            }
+	} else {
+            fs.writeSync(fd, 'cmdGetGroupConvo: group was not added or now VGroupID!\n')
+            num_cantrun++
+	}
+
+    }
+
+
+    // cmdGetReceivedMessage
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        const response  = WickrIOAPI.cmdGetReceivedMessage()
+	if (response) {
+            fs.writeSync(fd, 'cmdGetReceivedMessage: success: ' + response + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetReceivedMessage: success: returned empty list\n')
+            num_success++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetReceivedMessage: failed: ' + err + '\n')
+        num_failure++
+    }
+
+
+    /*
+     * Global list of users to send messages/attachments to
+     */
+    var sendToUsers = []
+    if (!directoryUsers || directoryUsers.length > 2) {
+        directoryUsers.forEach(element => {
+            if (element.name !== bot_username && element.is_bot !== true) {
+	        sendToUsers.push(element.name)
+	    }
+        });
+    }
+
+    // cmdSend1to1Message
+    if (sendToUsers.length === 0) {
+        fs.writeSync(fd, "**********************************************************\n")
+        fs.writeSync(fd, 'No users to send messages tests!\n')
+        num_cantrun += 3
+    } else {
+        // cmdSend1to1Message
+        fs.writeSync(fd, "**********************************************************\n")
+        try {
+            const response  = WickrIOAPI.cmdSend1to1Message(sendToUsers, "this is a test message for DM convos")
+	    if (response) {
+                fs.writeSync(fd, "cmdSend1to1Message: success: " + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdSend1to1Message: failed:\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdSend1to1Message: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // cmdSend1to1Attachment
+        fs.writeSync(fd, "**********************************************************\n")
+        const attachmentName = path.join(process.cwd(), filename)
+        try {
+            const response  = WickrIOAPI.cmdSend1to1Attachment(sendToUsers, attachmentName, 'testfile.txt')
+            if (response) {
+                fs.writeSync(fd, "cmdSend1to1Attachment: success: " + response + '\n')
+                num_success++
+            } else {
+                fs.writeSync(fd, 'cmdSend1to1Attachment: failed: empty value\n')
+                num_failure++
+            }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdSend1to1Attachment: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // create a User Name file with the list of users from the sendToUsers array
+        const userNameFile = 'userNameFile.txt'
+        var fd = fs.openSync('userNameFile.txt', 'w')
+        sendToUsers.forEach(userName => {
+            fs.writeSync(fd, userName + "\n")
+        })
+        fs.closeSync(fd)
+	const userNameFilePath = path.join(process.cwd(), userNameFile)
+
+        // cmdSendMessageUserNameFile
+        fs.writeSync(fd, "**********************************************************\n")
+        try {
+            const response  = WickrIOAPI.cmdSendMessageUserNameFile(userNameFilePath, "this is a test message using a UserName file")
+	    if (response) {
+                fs.writeSync(fd, "cmdSendMessageUserNameFile: success: " + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdSendMessageUserNameFile: failed:\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdSendMessageUserNameFile: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // cmdSendMessageUserHashFile
+        num_notcoded++
+
+        // cmdSendAttachmentUserNameFile
+        fs.writeSync(fd, "**********************************************************\n")
+        try {
+            const response  = WickrIOAPI.cmdSendAttachmentUserNameFile(userNameFilePath, attachmentName, 'testfile.txt')
+            if (response) {
+                fs.writeSync(fd, "cmdSendAttachmentUserNameFile: success: " + response + '\n')
+                num_success++
+            } else {
+                fs.writeSync(fd, 'cmdSendAttachmentUserNameFile: failed: empty value\n')
+                num_failure++
+            }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdSendAttachmentUserNameFile: failed: ' + err + '\n')
+            num_failure++
+        }
+
+        // cmdSendAttachmentUserHashFile
+        num_notcoded++
+    }
+
+    // cmdSendVoiceMemoUserNameFile
+    num_notcoded++
+    // cmdSendVoiceMemoUserHashFile
+    num_notcoded++
+
+    // cmdSendNetworkMessage
+    num_notcoded++
+    // cmdSendSecurityGroupMessage
+    num_notcoded++
+    // cmdSendNetworkAttachment
+    num_notcoded++
+    // cmdSendSecurityGroupAttachment
+    num_notcoded++
+    // cmdSendNetworkVoiceMemo
+    num_notcoded++
+    // cmdSendSecurityGroupVoiceMemo
+    num_notcoded++
+
+    // cmdEncryptString
+    fs.writeSync(fd, "**********************************************************\n")
+    const origString='This is a test string 123456 !@#$%'
+    var encryptedString = undefined
+    var encryptStringSuccess = undefined
+    try {
+        encryptedString = WickrIOAPI.cmdEncryptString(origString)
+	if (encryptedString) {
+            fs.writeSync(fd, 'cmdEncryptString: success: ' + encryptedString + '\n')
+            num_success++
+            encryptStringSuccess = true
+	} else {
+            fs.writeSync(fd, 'cmdEncryptString: failed!\n')
+            num_failure++
+            encryptStringSuccess = false
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdEncryptString: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDecryptString
+    fs.writeSync(fd, "**********************************************************\n")
+    if (encryptStringSuccess) {
+        try {
+            const response = WickrIOAPI.cmdDecryptString(encryptedString)
+	    if (response) {
+                if (response === origString) {
+                    fs.writeSync(fd, 'cmdDecryptString: success: ' + response + '\n')
+                    num_success++
+		} else {
+                    fs.writeSync(fd, 'cmdDecryptString: returned string is not equal to original: ' + response + '\n')
+                    num_failure++
+		}
+	    } else {
+                fs.writeSync(fd, 'cmdDecryptString: failed!\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdDecryptString: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdDecryptString: string was not encrypted!\n')
+        num_cantrun++
+    }
+
+
+    // cmdAddKeyValue
+    fs.writeSync(fd, "**********************************************************\n")
+    const keyName='KeyName123'
+    const keyValue='KeyValue123'
+    var addKeyValueSuccess = undefined
+    try {
+        const response = WickrIOAPI.cmdAddKeyValue(keyName, keyValue)
+	if (response) {
+            fs.writeSync(fd, 'cmdAddKeyValue: success!\n')
+            num_success++
+            addKeyValueSuccess = true
+	} else {
+            fs.writeSync(fd, 'cmdAddKeyValue: failed!\n')
+            num_failure++
+            addKeyValueSuccess = false
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdAddKeyValue: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetKeyValue
+    fs.writeSync(fd, "**********************************************************\n")
+    if (addKeyValueSuccess) {
+        try {
+            const response = WickrIOAPI.cmdGetKeyValue(keyName)
+	    if (response) {
+                fs.writeSync(fd, 'cmdGetKeyValue: success: ' + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdGetKeyValue: failed!\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdGetKeyValue: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdGetKeyValue: Key Value was not added!\n')
+        num_cantrun++
+    }
+
+    // cmdDeleteKeyValue
+    fs.writeSync(fd, "**********************************************************\n")
+    if (addKeyValueSuccess) {
+        try {
+            const response = WickrIOAPI.cmdDeleteKeyValue(keyName)
+	    if (response) {
+                fs.writeSync(fd, 'cmdDeleteKeyValue: success: ' + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdDeleteKeyValue: failed!\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdDeleteKeyValue: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdDeleteKeyValue: Key Value was not added!\n')
+        num_cantrun++
+    }
+
+    // cmdClearAllKeyValues
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        const response = WickrIOAPI.cmdClearAllKeyValues()
+	if (response) {
+            fs.writeSync(fd, 'cmdClearAllKeyValues: success!\n')
+            num_success++
+            addKeyValueSuccess = true
+	} else {
+            fs.writeSync(fd, 'cmdClearAllKeyValues: failed!\n')
+            num_failure++
+            addKeyValueSuccess = false
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdClearAllKeyValues: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdSetControl
+    num_notcoded++
+
+    // cmdAddMessageID
+    fs.writeSync(fd, "**********************************************************\n")
+    const messageID='ABC123'
+    var addMsgIdSuccess = undefined
+    try {
+        const response = WickrIOAPI.cmdAddMessageID(messageID, bot_username, 'target', 'date', 'This is a test message')
+	if (response) {
+            fs.writeSync(fd, 'cmdAddMessageID: success!\n')
+            num_success++
+            addMsgIdSuccess = true
+	} else {
+            fs.writeSync(fd, 'cmdAddMessageID: failed!\n')
+            num_failure++
+            addMsgIdSuccess = false
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdAddMessageID: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetMessageIDEntry
+    fs.writeSync(fd, "**********************************************************\n")
+    if (addMsgIdSuccess) {
+        try {
+            const response = WickrIOAPI.cmdGetMessageIDEntry(messageID)
+	    if (response) {
+                fs.writeSync(fd, 'cmdGetMessageIDEntry: success: ' + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdGetMessageIDEntry: failed!\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdGetMessageIDEntry: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdGetMessageIDEntry: message ID was not added!\n')
+        num_cantrun++
+    }
+
+    // cmdGetMessageIDTable
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var result = WickrIOAPI.cmdGetMessageIDTable("0", "10")
+        if (result) {
+            const response = isJson(result)
+            fs.writeSync(fd, 'cmdGetMessageIDTable: success: ' + result + '\n')
+            num_success++
+        } else {
+            fs.writeSync(fd, 'cmdGetMessageIDTable: failed: returned empty list\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetMessageIDTable: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdDeleteMessageID
+    fs.writeSync(fd, "**********************************************************\n")
+    if (addMsgIdSuccess) {
+        try {
+            const response = WickrIOAPI.cmdDeleteMessageID(messageID)
+	    if (response) {
+                fs.writeSync(fd, 'cmdDeleteMessageID: success!\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdDeleteMessageID: failed!\n')
+                num_failure++
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdDeleteMessageID: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdDeleteMessageIDEntry: message ID was not added!\n')
+        num_cantrun++
+    }
+
+    // cmdCancelMessageID
+    num_notcoded++
+
+    // cmdGetMessageStatus
+    num_notcoded++
+    // cmdSetMessageStatus
+    num_notcoded++
+
+    // cmdSendDeleteMessage
+    num_notcoded++
+    // cmdSendRecallMessage
+    num_notcoded++
+
+    // cmdGetVerificationList
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdGetVerificationList()
+	if (verList) {
+            const response = isJson(verList)
+            fs.writeSync(fd, 'cmdGetVerificationList: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetVerificationList: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetVerificationList: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdVerifyUsers
+    fs.writeSync(fd, "**********************************************************\n")
+    if (directoryUsers === undefined) {
+        fs.writeSync(fd, 'cmdVerifyUsers: directoryUsers list is indefined!\n')
+        num_cantrun++
+    } else if (securityGroups.size === 0) {
+        fs.writeSync(fd, 'cmdVerifyUsers: directoryUsers list is empty!\n')
+        num_cantrun++
+    } else {
+        try {
+            const user = [ directoryUsers[0].name ]
+            if (user === undefined) {
+                fs.writeSync(fd, 'cmdVerifyUsers: user name is undefined!\n')
+                num_failure++
+	    } else {
+                const response = WickrIOAPI.cmdVerifyUsers(user)
+	        if (response) {
+                    fs.writeSync(fd, 'cmdVerifyUsers: success: ' + response + '\n')
+                    num_success++
+	        } else {
+                    fs.writeSync(fd, 'cmdVerifyUsers: failed: returned empty response\n')
+                    num_failure++
+	        }
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdVerifyUsers: failed: ' + err + '\n')
+            num_failure++
+        }
+    }
+
+    // cmdVerifyAll
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdVerifyAll()
+	if (verList) {
+            fs.writeSync(fd, 'cmdVerifyAll: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdVerifyAll: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdVerifyAll: failed: ' + err + '\n')
+        num_failure++
+    }
+
+
+    // cmdSetVerificationMode
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdSetVerificationMode("automatic")
+	if (verList) {
+            fs.writeSync(fd, 'cmdSetVerificationMode: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdSetVerificationMode: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSetVerificationMode: failed: ' + err + '\n')
+        num_failure++
+    }
+
+
+    // cmdGetUserInfo
+    fs.writeSync(fd, "**********************************************************\n")
+    if (directoryUsers === undefined) {
+        fs.writeSync(fd, 'cmdGetUserInfo: directoryUsers list is indefined!\n')
+        num_cantrun++
+    } else if (securityGroups.size === 0) {
+        fs.writeSync(fd, 'cmdGetUserInfo: directoryUsers list is empty!\n')
+        num_cantrun++
+    } else {
+        try {
+            const user = [ directoryUsers[0].name ]
+            if (user === undefined) {
+                fs.writeSync(fd, 'cmdGetUserInfo: user name is undefined!\n')
+                num_failure++
+	    } else {
+                var userInfo = WickrIOAPI.cmdGetUserInfo(user)
+	        if (userInfo) {
+                    fs.writeSync(fd, 'cmdGetUserInfo: success: ' + userInfo + '\n')
+                    num_success++
+	        } else {
+                    fs.writeSync(fd, 'cmdGetUserInfo: failed: returned empty list\n')
+                    num_failure++
+	        }
+	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdGetUserInfo: failed: ' + err + '\n')
+            num_failure++
+        }
+    }
+
+    // cmdGetServerInfo
+    var serverInfo = undefined
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdGetServerInfo()
+	if (verList) {
+            serverInfo = isJson(verList)
+            fs.writeSync(fd, 'cmdGetServerInfo: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetServerInfo: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetServerInfo: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetClientInfo
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdGetClientInfo()
+	if (verList) {
+            const response = isJson(verList)
+            fs.writeSync(fd, 'cmdGetClientInfo: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetClientInfo: failed: returned empty list\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetClientInfo: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // cmdGetNetworkRooms
+    fs.writeSync(fd, "**********************************************************\n")
+    if (serverInfo !== undefined) {
+        try {
+            const response = WickrIOAPI.cmdGetNetworkRooms(serverInfo.network_id)
+	    if (verList) {
+                fs.writeSync(fd, 'cmdGetNetworkRooms: success: ' + response + '\n')
+                num_success++
+	    } else {
+                fs.writeSync(fd, 'cmdGetNetworkRooms: failed: returned empty list\n')
+                num_failure++
+    	    }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdGetNetworkRooms: failed: ' + err + '\n')
+            num_failure++
+        }
+    } else {
+        fs.writeSync(fd, 'cmdGetNetworkRooms: get server info is empty!\n')
+        num_cantrun++
+    }
+
+    // cmdGetBotsList
+    // Can't implement this without Token Credentials
+
+    // cmdGetTransmitQueueInfo
+    fs.writeSync(fd, "**********************************************************\n")
+    try {
+        var verList = WickrIOAPI.cmdGetTransmitQueueInfo()
+	if (verList) {
+            const response = isJson(verList)
+            fs.writeSync(fd, 'cmdGetTransmitQueueInfo: success: ' + verList + '\n')
+            num_success++
+	} else {
+            fs.writeSync(fd, 'cmdGetTransmitQueueInfo: failed: returned empty value\n')
+            num_failure++
+	}
+    } catch (err) {
+        fs.writeSync(fd, 'cmdGetTransmitQueueInfo: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // SUMMARY
+    fs.writeSync(fd, "**********************************************************\n")
+    fs.writeSync(fd, 'Number of success:' + num_success + '\n')
+    fs.writeSync(fd, 'Number of failure:' + num_failure + '\n')
+    fs.writeSync(fd, 'Number cannot run:' + num_cantrun + '\n')
+    fs.writeSync(fd, 'Number not coded :' + num_notcoded + '\n')
+    fs.writeSync(fd, "**********************************************************\n")
+
+    return { 
+        'num_success' : num_success,
+        'num_failure' : num_failure,
+        'num_cantrun' : num_cantrun,
+        'num_notcoded' : num_notcoded,
+    }
+
+    fs.closeSync(fd)
+}
 
 function listen(message) {
   try {
@@ -294,9 +1433,36 @@ function listen(message) {
       //Respond back to the user or room with a message(using vGroupID)
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
     }
+    /*
+     * The /test command will run the Addon API tests
+     */
+    else if (command == '/test') {
+        const reply = 'Starting the Addon API tests'
+        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
+        const response = testapis('test_output.txt')
+	if (response) {
+            const responsestring = JSON.stringify(response, null, 4)
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+
+	    const filename = path.join(process.cwd(), 'test_output.txt')
+            var sFileMessage = WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_output.txt', "", "", []);
+	} else {
+            const responsestring = 'Received invalid response from the test function!'
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+	}
+    }
   } catch (err) {
     console.log(err);
   }
+}
+
+function isJson(str) {
+    try {
+        str = JSON.parse(str)
+    } catch (e) {
+        return false
+    }
+    return str
 }
 
 main();
