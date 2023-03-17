@@ -1264,7 +1264,16 @@ function listen(message) {
      * it could be a Room convo.
      */
     if (command === '/help') {
-      var reply = "What can I help you with?";
+      var reply = "Here are the commands supported:"
+      reply += "\n/list : sends you a list"
+      reply += "\n/dm : tests out the DM button, gives you a list of users to DM"
+      reply += "\n/button : sends you a message with buttons"
+      reply += "\n/test : tests the addon and sends you results"
+      reply += "\n/urlbutton |<url>| : sends you a URL button, client may not support"
+      reply += "\n/rooms : responds with the list of rooms the bot is in"
+      reply += "\n/sendrooms : sends test message to rooms"
+      reply += "\n/help : displays this message"
+      reply += "\nWhat can I help you with?";
 
       // if you want to reply back to the user privately uncomment the following 2 lines
       // var users = [userEmail];
@@ -1434,6 +1443,40 @@ function listen(message) {
       var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
     }
     /*
+     * Process the '/urlbutton' command
+     *
+     * Responds with several buttons, of the different button types.
+     */
+    else if (command === '/urlbutton') {
+      if (argument === undefined || argument === '') {
+        var url2use='https://amazon.com'
+      } else {
+        var url2use=argument
+      }
+
+      const reply = 'this is a /button response'
+      const messagemeta = {
+        buttons: [
+          {
+            type: 'message',
+            text: 'Help',
+            message: '/help',
+            preferred: 'true',
+          },
+          {
+            type: 'url',
+            text: 'URL Button',
+            url: url2use,
+          },
+        ],
+      }
+      const messagemetastring = JSON.stringify(messagemeta)
+      console.log('messageMetaString=', messagemetastring)
+
+      //Respond back to the user or room with a message(using vGroupID)
+      var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], messagemetastring);
+    }
+    /*
      * The /test command will run the Addon API tests
      */
     else if (command == '/test') {
@@ -1450,6 +1493,47 @@ function listen(message) {
             const responsestring = 'Received invalid response from the test function!'
             var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 	}
+    }
+    else if (command == '/rooms') {
+        const rooms = WickrIOAPI.cmdGetRooms();
+        const obj = JSON.parse(rooms);
+
+        const responsestring = JSON.stringify(rooms, null, 4)
+        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+    }
+    else if (command == '/sendrooms') {
+        const rooms = WickrIOAPI.cmdGetRooms();
+        const obj = JSON.parse(rooms);
+
+        console.log('obj=', obj);
+        const arrayLength = obj.rooms.length;
+        console.log('rooms length=', arrayLength);
+        var sMessage2 = WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
+        for (var i = 0; i < arrayLength; i++) {
+            console.log(obj.rooms[i].vgroupid);
+            const responsestring= 'Send message to room with VgroupID ' + obj.rooms[i].vgroupid;
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, argument, "", "", "", [], "");
+        }
+    }
+    else if (command == '/demo') {
+        const rooms = WickrIOAPI.cmdGetRooms();
+        const obj = JSON.parse(rooms);
+
+        const democontent = 'This is the demo content:\nHi there!\n\nTest';
+
+        //console.log('obj=', obj);
+        const arrayLength = obj.rooms.length;
+        //console.log('rooms length=', arrayLength);
+        var sMessage2 = WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
+        for (var i = 0; i < arrayLength; i++) {
+            //console.log(obj.rooms[i].vgroupid);
+            const responsestring= 'Send demo conten to room with VgroupID ' + obj.rooms[i].vgroupid;
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, democontent, "", "", "", [], "");
+        }
     }
   } catch (err) {
     console.log(err);
