@@ -1454,7 +1454,7 @@ function listen(message) {
         var url2use=argument
       }
 
-      const reply = 'this is a /button response'
+      const reply = 'this is a /urlbutton response'
       const messagemeta = {
         buttons: [
           {
@@ -1466,7 +1466,7 @@ function listen(message) {
           {
             type: 'url',
             text: 'URL Button',
-            url: url2use,
+            value: url2use,
           },
         ],
       }
