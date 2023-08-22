@@ -721,11 +721,11 @@ function testapis(filename) {
 
         // create a User Name file with the list of users from the sendToUsers array
         const userNameFile = 'userNameFile.txt'
-        var fd = fs.openSync('userNameFile.txt', 'w')
+        var unffd = fs.openSync('userNameFile.txt', 'w')
         sendToUsers.forEach(userName => {
-            fs.writeSync(fd, userName + "\n")
+            fs.writeSync(unffd, userName + "\n")
         })
-        fs.closeSync(fd)
+        fs.closeSync(unffd)
 	const userNameFilePath = path.join(process.cwd(), userNameFile)
 
         // cmdSendMessageUserNameFile
