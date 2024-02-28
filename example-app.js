@@ -5,12 +5,16 @@ const WickrIOAPI = require('wickrio_addon');
 const WickrIOBotAPI = require('wickrio-bot-api');
 const WickrUser = WickrIOBotAPI.WickrUser;
 const bot = new WickrIOBotAPI.WickrIOBot();
+const apiService = bot.apiService();
 
 var bot_username
 var output_filename
 
 //so the program will not close instantly
 process.stdin.resume();
+
+// Used to wait for commands to finish
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 async function exitHandler(options, err) {
   try {
@@ -106,13 +110,13 @@ function testapis(filename) {
     fs.writeSync(fd, "**********************************************************\n")
     try {
         var result = WickrIOAPI.getClientState()
-	if (result) {
+        if (result) {
             fs.writeSync(fd, 'getClientState: success: ' + result + '\n')
             num_success++
-	} else {
+        } else {
             fs.writeSync(fd, 'getClientState: failed: returned empty value\n')
             num_failure++
-	}
+        }
     } catch (err) {
         fs.writeSync(fd, 'getClientState: failed: ' + err + '\n')
         num_failure++
@@ -128,7 +132,7 @@ function testapis(filename) {
     fs.writeSync(fd, "**********************************************************\n")
     try {
         var result = WickrIOAPI.cmdSetMsgCallback(msgCallbackURL)
-	if (result) {
+        if (result) {
             fs.writeSync(fd, 'cmdSetMsgCallback: success: ' + result + '\n')
             num_success++
 	} else {
@@ -721,12 +725,12 @@ function testapis(filename) {
 
         // create a User Name file with the list of users from the sendToUsers array
         const userNameFile = 'userNameFile.txt'
-        var unffd = fs.openSync('userNameFile.txt', 'w')
+        var unamefd = fs.openSync('userNameFile.txt', 'w')
         sendToUsers.forEach(userName => {
-            fs.writeSync(unffd, userName + "\n")
+            fs.writeSync(unamefd, userName + "\n")
         })
-        fs.closeSync(unffd)
-	const userNameFilePath = path.join(process.cwd(), userNameFile)
+        fs.closeSync(unamefd)
+        const userNameFilePath = path.join(process.cwd(), userNameFile)
 
         // cmdSendMessageUserNameFile
         fs.writeSync(fd, "**********************************************************\n")
@@ -1214,7 +1218,413 @@ function testapis(filename) {
     fs.closeSync(fd)
 }
 
-function listen(message) {
+async function fileIsDeleted(attachmentCopyName)
+{
+  await sleep(1000)
+  if (!fs.existsSync(attachmentCopyName))
+	return true;
+  await sleep(1000)
+  if (!fs.existsSync(attachmentCopyName))
+	return true;
+  await sleep(1000)
+  if (!fs.existsSync(attachmentCopyName))
+	return true;
+  await sleep(1000)
+  if (!fs.existsSync(attachmentCopyName))
+	return true;
+  await sleep(1000)
+  if (!fs.existsSync(attachmentCopyName))
+	return true;
+  return false
+}
+
+/**
+ * This function will current test the ability to send attachments
+ * and have those sent files removed after they have been sent.
+ */
+async function testsendattachments(filename, userEmail, vGroupID) {
+    var fd = fs.openSync(filename, 'w')
+    fs.writeSync(fd, "Starting to run WickrIO send attachment API tests\n")
+
+    var num_success = 0
+    var num_failure = 0
+    var num_cantrun = 0
+    var num_notcoded = 0
+
+    const attachmentName = path.join(process.cwd(), filename)
+    let attachmentCopyName = '';
+
+    const sendToUsers = [userEmail]
+
+    /******************************************************************************
+     * Tests of the wickrio_addon APIs
+     *****************************************************************************/
+
+    /*
+     * cmdSend1to1Attachment
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_1to1_attachment.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response = await WickrIOAPI.cmdSend1to1Attachment(sendToUsers, attachmentCopyName, 'test_send_1to1_attachment.txt', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSend1to1Attachment: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSend1to1Attachment: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSend1to1Attachment: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSend1to1Attachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * cmdSendAttachmentUserNameFile
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // create a User Name file with the list of users from the sendToUsers array
+    const userNameFile = 'userNameFile.txt'
+    var unamefd = fs.openSync('userNameFile.txt', 'w')
+    sendToUsers.forEach(userName => {
+        fs.writeSync(unamefd, userName + "\n")
+    })
+    fs.closeSync(unamefd)
+    const userNameFilePath = path.join(process.cwd(), userNameFile)
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_username_attachment.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response  = await WickrIOAPI.cmdSendAttachmentUserNameFile(userNameFilePath, attachmentCopyName, 'test_send_username_attachment.txt', '', '', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSendAttachmentUserNameFile: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSendAttachmentUserNameFile: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSendAttachmentUserNameFile: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSendAttachmentUserNameFile: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * cmdSendVoiceMemoUserNameFile
+     */
+    num_notcoded++
+
+    /*
+     * cmdSendAttachmentUserHashFile
+     */
+    num_notcoded++
+
+    /*
+     * cmdSendVoiceMemoUserHashFile
+     */
+    num_notcoded++
+
+    /*
+     * cmdSendNetworkAttachment
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_network_attachment.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response = await WickrIOAPI.cmdSendNetworkAttachment(attachmentCopyName, 'test_send_network_attachment.txt', '', '', '', '', '', true);
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSendNetworkAttachment: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSendNetworkAttachment: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSendNetworkAttachment: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSendNetworkAttachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * cmdSendNetworkVoiceMemo
+     */
+    num_notcoded++
+
+    /*
+     * Setup for Security Group attachment messages
+     */
+
+    // Global variable that can be used by following tests
+    var securityGroups = undefined
+    var securityGroupList = []
+    try {
+        var security = WickrIOAPI.cmdGetSecurityGroups()
+        if (security) {
+            securityGroups = isJson(security)
+
+            if (securityGroups !== undefined && securityGroups.size !== 0) {
+	        for (var i=0; i<securityGroups.size; i++) {
+                    securityGroupList.push(securityGroups[i].id);
+		}
+	    }
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'Failed to get security groups: ' + err + '\n')
+    }
+
+
+    /*
+     * cmdSendSecurityGroupAttachment
+     */
+    if (securityGroupList.size === 0) {
+        num_cantrun++
+    } else {
+        fs.writeSync(fd, "**********************************************************\n")
+
+        // Copy the attachment file to the copy file, so we don't lose the attachment file
+        attachmentCopyName = path.join(process.cwd(), 'test_send_security_group_attachment.txt')
+        fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+        try {
+            const response = await WickrIOAPI.cmdSendSecurityGroupAttachment(securityGroupList, attachmentCopyName, 'test_send_security_group_attachment.txt', '', '', '', '', '', true);
+            if (response) {
+	        if (fileIsDeleted(attachmentCopyName)) {
+                  fs.writeSync(fd, "cmdSendSecurityGroupAttachment: success: " + response + '\n')
+                  num_success++
+	        } else {
+                  fs.writeSync(fd, 'cmdSendSecurityGroupAttachment: failed to remove the file with 5 seconds\n')
+                  num_failure++
+	        }
+            } else {
+                fs.writeSync(fd, 'cmdSendSecurityGroupAttachment: failed: empty value\n')
+                num_failure++
+            }
+        } catch (err) {
+            fs.writeSync(fd, 'cmdSendSecurityGroupAttachment: failed: ' + err + '\n')
+            num_failure++
+        }
+    }
+
+    /*
+     * cmdSendSecurityGroupVoiceMemo
+     */
+    num_notcoded++
+
+    /*
+     * cmdSendRoomAttachment
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_room_attachment.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response = await WickrIOAPI.cmdSendRoomAttachment(vGroupID, attachmentCopyName, 'test_send_room_attachment.txt', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSendRoomAttachment: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSendRoomAttachment: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSendRoomAttachment: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSendRoomAttachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /******************************************************************************
+     * Tests of the wickrio-bot-api APIs
+     *****************************************************************************/
+
+    /*
+     * sendAttachmentUserNameFile
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_username_attachment_bot-api.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response  = await apiService.sendAttachmentUserNameFile(userNameFilePath, attachmentCopyName, 'test_send_username_attachment_bot-api.txt', '', '', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "bot-api.sendAttachmentUserNameFile: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'bot-api.sendAttachmentUserNameFile: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'bot-api.sendAttachmentUserNameFile: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'bot-api.sendAttachmentUserNameFile: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * sendVoiceMemoUserNameFile
+     */
+    num_notcoded++
+
+    /*
+     * sendAttachmentUserHashFile
+     */
+    num_notcoded++
+
+    /*
+     * sendVoiceMemoUserHashFile
+     */
+    num_notcoded++
+
+    /*
+     * sendNetworkAttachment
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_network_attachment_bot-api.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response = await apiService.sendNetworkAttachment(attachmentCopyName, 'test_send_network_attachment_bot-api.txt', '', '', '', '', '', true);
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "bot-api.sendNetworkAttachment: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'bot-api.sendNetworkAttachment: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'bot-api.sendNetworkAttachment: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'bot-api.sendNetworkAttachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * sendNetworkVoiceMemo
+     */
+    num_notcoded++
+
+    /*
+     * sendSecurityGroupAttachment
+     */
+    if (securityGroupList.size === 0) {
+        num_cantrun++
+    } else {
+        fs.writeSync(fd, "**********************************************************\n")
+
+        // Copy the attachment file to the copy file, so we don't lose the attachment file
+        attachmentCopyName = path.join(process.cwd(), 'test_send_security_group_attachment_bot-api.txt')
+        fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+        try {
+            const response = await apiService.sendSecurityGroupAttachment(securityGroupList, attachmentCopyName, 'test_send_security_group_attachment_bot-api.txt', '', '', '', '', '', true);
+            if (response) {
+	        if (fileIsDeleted(attachmentCopyName)) {
+                  fs.writeSync(fd, "bot-api.sendSecurityGroupAttachment: success: " + response + '\n')
+                  num_success++
+	        } else {
+                  fs.writeSync(fd, 'bot-api.sendSecurityGroupAttachment: failed to remove the file with 5 seconds\n')
+                  num_failure++
+	        }
+            } else {
+                fs.writeSync(fd, 'bot-api.sendSecurityGroupAttachment: failed: empty value\n')
+                num_failure++
+            }
+        } catch (err) {
+            fs.writeSync(fd, 'bot-api.sendSecurityGroupAttachment: failed: ' + err + '\n')
+            num_failure++
+        }
+    }
+
+    /*
+     * sendSecurityGroupVoiceMemo
+     */
+    num_notcoded++
+
+    /*
+     * sendRoomAttachment
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    // Copy the attachment file to the copy file, so we don't lose the attachment file
+    attachmentCopyName = path.join(process.cwd(), 'test_send_room_attachment_bot-api.txt')
+    fs.copyFileSync(attachmentName, attachmentCopyName); 
+
+    try {
+        const response = await apiService.sendRoomAttachment(vGroupID, attachmentCopyName, 'test_send_room_attachment_bot-api.txt', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "bot-api.sendRoomAttachment: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'bot-api.sendRoomAttachment: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'bot-api.sendRoomAttachment: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'bot-api.sendRoomAttachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    // SUMMARY
+    fs.writeSync(fd, "**********************************************************\n")
+    fs.writeSync(fd, 'Number of success:' + num_success + '\n')
+    fs.writeSync(fd, 'Number of failure:' + num_failure + '\n')
+    fs.writeSync(fd, 'Number cannot run:' + num_cantrun + '\n')
+    fs.writeSync(fd, 'Number not coded :' + num_notcoded + '\n')
+    fs.writeSync(fd, "**********************************************************\n")
+
+    return { 
+        'num_success' : num_success,
+        'num_failure' : num_failure,
+        'num_cantrun' : num_cantrun,
+        'num_notcoded' : num_notcoded,
+    }
+
+    fs.closeSync(fd)
+}
+
+async function listen(message) {
   try {
     // The parseMessage() function will parse the incoming message and
     // returns and object with command, argument, vGroupID and Sender fields
@@ -1269,6 +1679,7 @@ function listen(message) {
       reply += "\n/dm : tests out the DM button, gives you a list of users to DM"
       reply += "\n/button : sends you a message with buttons"
       reply += "\n/test : tests the addon and sends you results"
+      reply += "\n/sendtest : tests the attachment send tests"
       reply += "\n/urlbutton |<url>| : sends you a URL button, client may not support"
       reply += "\n/rooms : responds with the list of rooms the bot is in"
       reply += "\n/sendrooms : sends test message to rooms"
@@ -1483,16 +1894,32 @@ function listen(message) {
         const reply = 'Starting the Addon API tests'
         var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
         const response = testapis('test_output.txt')
-	if (response) {
+        if (response) {
             const responsestring = JSON.stringify(response, null, 4)
             var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 
-	    const filename = path.join(process.cwd(), 'test_output.txt')
+            const filename = path.join(process.cwd(), 'test_output.txt')
             var sFileMessage = WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_output.txt', "", "", []);
-	} else {
+        } else {
             const responsestring = 'Received invalid response from the test function!'
             var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
-	}
+        }
+    }
+    else if (command == '/sendtest') {
+        const reply = 'Starting the send attachment tests'
+        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
+
+        const response = await testsendattachments('test_send_attachment_output.txt', userEmail, vGroupID);
+        if (response) {
+            const responsestring = JSON.stringify(response, null, 4)
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+
+            const filename = path.join(process.cwd(), 'test_send_attachment_output.txt')
+            var sFileMessage = WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_send_attachment_output.txt', "", "", '', true);
+        } else {
+            const responsestring = 'Received invalid response from the testsendattachments function!'
+            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+        }
     }
     else if (command == '/rooms') {
         const rooms = WickrIOAPI.cmdGetRooms();
