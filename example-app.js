@@ -1289,6 +1289,32 @@ async function testsendattachments(filename, userEmail, vGroupID) {
     }
 
     /*
+     * cmdSend1to1Attachment with a URL
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    const urlFileName='https:\/\/images.freeimages.com\/images\/large-previews\/7c0\/bird-1310808.jpg'
+
+    try {
+        const response = await WickrIOAPI.cmdSend1to1Attachment(sendToUsers, urlFileName, 'bird-1310808.jpg', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSend1to1Attachment.URL: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
      * cmdSendAttachmentUserNameFile
      */
     fs.writeSync(fd, "**********************************************************\n")
