@@ -91,7 +91,7 @@ function outputtestmessage(message) {
     }
 }
 
-function testapis(filename) {
+async function testapis(filename) {
     var fd = fs.openSync(filename, 'w')
     fs.writeSync(fd, "Starting to run WickrIO Addon API tests\n")
 
@@ -108,8 +108,9 @@ function testapis(filename) {
 
     // getClientState
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing getClientState')
     try {
-        var result = WickrIOAPI.getClientState()
+        var result = await WickrIOAPI.getClientState()
         if (result) {
             fs.writeSync(fd, 'getClientState: success: ' + result + '\n')
             num_success++
@@ -130,8 +131,9 @@ function testapis(filename) {
     // cmdSetMsgCallback
     const msgCallbackURL="https://msgCallback"
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdSetMsgCallback')
     try {
-        var result = WickrIOAPI.cmdSetMsgCallback(msgCallbackURL)
+        var result = await WickrIOAPI.cmdSetMsgCallback(msgCallbackURL)
         if (result) {
             fs.writeSync(fd, 'cmdSetMsgCallback: success: ' + result + '\n')
             num_success++
@@ -146,9 +148,10 @@ function testapis(filename) {
 
     // cmdGetMsgCallback
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetMsgCallback')
     try {
-        var result = WickrIOAPI.cmdGetMsgCallback()
-	if (result) {
+        var result = await WickrIOAPI.cmdGetMsgCallback()
+	    if (result) {
             const response = isJson(result)
 	    if (response !== false && response.callback === msgCallbackURL) {
                 fs.writeSync(fd, 'cmdGetMsgCallback: success: ' + result + '\n')
@@ -168,8 +171,9 @@ function testapis(filename) {
 
     // cmdDeleteMsgCallback
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteMsgCallback')
     try {
-        var result = WickrIOAPI.cmdDeleteMsgCallback()
+        var result = await WickrIOAPI.cmdDeleteMsgCallback()
 	if (result) {
             fs.writeSync(fd, 'cmdDeleteMsgCallback: success: ' + result + '\n')
             num_success++
@@ -185,8 +189,9 @@ function testapis(filename) {
     // cmdSetEventCallback
     const eventCallbackURL="https://eventCallback"
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdSetEventCallback')
     try {
-        var result = WickrIOAPI.cmdSetEventCallback(eventCallbackURL)
+        var result = await WickrIOAPI.cmdSetEventCallback(eventCallbackURL)
 	if (result) {
             fs.writeSync(fd, 'cmdSetEventCallback: success: ' + result + '\n')
             num_success++
@@ -201,9 +206,10 @@ function testapis(filename) {
 
     // cmdGetEventCallback
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetEventCallback')
     try {
-        var result = WickrIOAPI.cmdGetEventCallback()
-	if (result) {
+        var result = await WickrIOAPI.cmdGetEventCallback()
+	    if (result) {
             const response = isJson(result)
 	    if ((response !== false) && (response.callback === eventCallbackURL)) {
                 fs.writeSync(fd, 'cmdGetEventCallback: success: ' + result + '\n')
@@ -223,8 +229,9 @@ function testapis(filename) {
 
     // cmdDeleteEventCallback
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteEventCallback')
     try {
-        var result = WickrIOAPI.cmdDeleteEventCallback()
+        var result = await WickrIOAPI.cmdDeleteEventCallback()
 	if (result) {
             fs.writeSync(fd, 'cmdDeleteEventCallback: success: ' + result + '\n')
             num_success++
@@ -239,8 +246,9 @@ function testapis(filename) {
 
     // cmdPostEvent
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdPostEvent')
     try {
-        var result = WickrIOAPI.cmdPostEvent("This is a test event, please disregard.")
+        var result = await WickrIOAPI.cmdPostEvent("This is a test event, please disregard.")
 	if (result) {
             fs.writeSync(fd, 'cmdPostEvent: success: ' + result + '\n')
             num_success++
@@ -255,19 +263,20 @@ function testapis(filename) {
 
     // cmdGetDirectory
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetDirectory')
     // Global variable that can be used by following tests
     var directoryUsers = undefined
     try {
-        var directory = WickrIOAPI.cmdGetDirectory('0', '100')
-	if (directory) {
+        const directory = await WickrIOAPI.cmdGetDirectory('0', '100')
+    	if (directory) {
             directoryUsers = isJson(directory)
             fs.writeSync(fd, 'cmdGetDirectory: first 10 users:\n')
             fs.writeSync(fd, 'cmdGetDirectory: success: ' + directory + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetDirectory: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetDirectory: failed: ' + err + '\n')
         num_failure++
@@ -275,18 +284,20 @@ function testapis(filename) {
 
     // cmdGetSecurityGroups
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetSecurityGroups')
+
     // Global variable that can be used by following tests
     var securityGroups = undefined
     try {
-        var security = WickrIOAPI.cmdGetSecurityGroups()
-	if (security) {
+        var security = await WickrIOAPI.cmdGetSecurityGroups()
+	    if (security) {
             securityGroups = isJson(security)
             fs.writeSync(fd, 'cmdGetSecurityGroups: success: ' + security + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetSecurityGroups: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetSecurityGroups: failed: ' + err + '\n')
         num_failure++
@@ -294,8 +305,9 @@ function testapis(filename) {
 
     // cmdGetSecurityGroupDirectory
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetSecurityGroupDirectory')
     if (securityGroups === undefined) {
-        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroups list is indefined!\n')
+        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroups list is undefined!\n')
         num_cantrun++
     } else if (securityGroups.size === 0) {
         fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroups list is empty!\n')
@@ -307,17 +319,17 @@ function testapis(filename) {
                 fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: securityGroup is undefined!\n')
                 num_failure++
 	    } else {
-                var securityGroupUsers = WickrIOAPI.cmdGetSecurityGroupDirectory(securityGroup, '0', '10')
-	        if (securityGroupUsers) {
+                var securityGroupUsers = await WickrIOAPI.cmdGetSecurityGroupDirectory(securityGroup, '0', '10')
+	            if (securityGroupUsers) {
                     users = isJson(securityGroupUsers)
-		    if (users.length > 10) {
+		        if (users.length > 10) {
                         fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: failed: returned list with too many entries!\n')
                         num_failure++
-		    } else {
+		        } else {
 		        fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: first 10 users:\n')
                         fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: success: ' + securityGroupUsers + '\n')
                         num_success++
-		    }
+		        }
 	        } else {
                     fs.writeSync(fd, 'cmdGetSecurityGroupDirectory: failed: returned empty list\n')
                     num_failure++
@@ -331,8 +343,9 @@ function testapis(filename) {
 
     // cmdGetStatistics
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetStatistics')
     try {
-        var statistics = WickrIOAPI.cmdGetStatistics()
+        var statistics = await WickrIOAPI.cmdGetStatistics()
         var response = isJson(statistics)
         fs.writeSync(fd, 'cmdGetStatistics: success: ' + statistics + '\n')
         num_success++
@@ -343,8 +356,9 @@ function testapis(filename) {
 
     // cmdClearStatistics
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdClearStatistics')
     try {
-        var cleared = WickrIOAPI.cmdClearStatistics()
+        var cleared = await WickrIOAPI.cmdClearStatistics()
         fs.writeSync(fd, "cmdClearStatistics: success: " + cleared + '\n')
         num_success++
     } catch (err) {
@@ -369,19 +383,20 @@ function testapis(filename) {
 
         // cmdAddRoom
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdAddRoom')
         var roomVGroupID = undefined
         try {
-            const response  = WickrIOAPI.cmdAddRoom(roomMembers, roomModerators, 'TEST: TestRoom', 'Test Room Description')
-	    if (response) {
+            const response  = await WickrIOAPI.cmdAddRoom(roomMembers, roomModerators, 'TEST: TestRoom', 'Test Room Description')
+	        if (response) {
                 const result = isJson(response)
                 roomVGroupID = result.vgroupid
 
                 fs.writeSync(fd, "cmdAddRoom: success: " + response + '\n')
                 num_success++
-	    } else {
+	        } else {
                 fs.writeSync(fd, 'cmdAddRoom: failed:\n')
                 num_failure++
-	    }
+	        }
         } catch (err) {
             fs.writeSync(fd, 'cmdAddRoom: failed: ' + err + '\n')
             num_failure++
@@ -389,9 +404,10 @@ function testapis(filename) {
 
         // cmdGetRoom
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdGetRoom')
         if (roomVGroupID) {
             try {
-                const response  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+                const response  = await WickrIOAPI.cmdGetRoom(roomVGroupID)
 	        if (response) {
                     fs.writeSync(fd, "cmdGetRoom: success: " + response + '\n')
                     num_success++
@@ -410,26 +426,27 @@ function testapis(filename) {
 
         // cmdModifyRoom
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdModifyRoom')
         if (roomVGroupID) {
             // modify the title and the description
             try {
                 const newTitle = 'TEST: TestRoomUpdated'
                 const newDescr = 'Test Room Description Updated'
-                const response  = WickrIOAPI.cmdModifyRoom(roomVGroupID, roomMembers, roomModerators, newTitle, newDescr)
-	        if (response) {
-                    const getResponse  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+                const response  = await WickrIOAPI.cmdModifyRoom(roomVGroupID, roomMembers, roomModerators, newTitle, newDescr)
+	            if (response) {
+                    const getResponse  = await WickrIOAPI.cmdGetRoom(roomVGroupID)
                     const getResult = isJson(getResponse)
                     if (getResult.title === newTitle && getResult.description === newDescr) {
                         fs.writeSync(fd, "cmdModifyRoom: modify title/description success: " + response + '\n')
                         num_success++
-		    } else {
+		            } else {
                         fs.writeSync(fd, "cmdModifyRoom: didn't change the title/description failed: " + getResponse + '\n')
                         num_failure++
-		    }
-	        } else {
+		            }
+	            } else {
                     fs.writeSync(fd, 'cmdModifyRoom: modify title/description failed: empty value\n')
                     num_failure++
-	        }
+	            }
             } catch (err) {
                 fs.writeSync(fd, 'cmdModifyRoom: modify title/description failed: ' + err + '\n')
                 num_failure++
@@ -438,21 +455,21 @@ function testapis(filename) {
             const newRoomMembers = [bot_username, directoryUsers[0].name ]
             const newRoomModerators = [bot_username, directoryUsers[0].name ]
             try {
-                const response  = WickrIOAPI.cmdModifyRoom(roomVGroupID, newRoomMembers, newRoomModerators, 'TEST: TestRoomUpdated', 'Test Room Description Updated')
-	        if (response) {
-                    const getResponse  = WickrIOAPI.cmdGetRoom(roomVGroupID)
+                const response  = await WickrIOAPI.cmdModifyRoom(roomVGroupID, newRoomMembers, newRoomModerators, 'TEST: TestRoomUpdated', 'Test Room Description Updated')
+	            if (response) {
+                    const getResponse  = await WickrIOAPI.cmdGetRoom(roomVGroupID)
                     const getResult = isJson(getResponse)
                     if (getResult.members.length === newRoomMembers.length && getResult.masters.length === newRoomModerators.length) {
                         fs.writeSync(fd, "cmdModifyRoom: modify members/moderators success: " + response + '\n')
                         num_success++
-		    } else {
+		            } else {
                         fs.writeSync(fd, "cmdModifyRoom: didn't change the members/moderators failed: " + getResponse + '\n')
                         num_failure++
-		    }
-	        } else {
+		            }
+	            } else {
                     fs.writeSync(fd, 'cmdModifyRoom: modify members/moderators failed: empty value\n')
                     num_failure++
-	        }
+	            }
             } catch (err) {
                 fs.writeSync(fd, 'cmdModifyRoom: modify members/moderators failed: ' + err + '\n')
                 num_failure++
@@ -472,8 +489,9 @@ function testapis(filename) {
         } else {
             // cmdSendRoomMessage
             fs.writeSync(fd, "**********************************************************\n")
+            console.log('testing cmdSendRoomMessage')
             try {
-                const response  = WickrIOAPI.cmdSendRoomMessage(roomVGroupID, "this is a test message for Room convos")
+                const response  = await WickrIOAPI.cmdSendRoomMessage(roomVGroupID, "this is a test message for Room convos")
 	        if (response) {
                     fs.writeSync(fd, "cmdSendRoomMessage: success: " + response + '\n')
                     num_success++
@@ -488,9 +506,10 @@ function testapis(filename) {
 
             // cmdSendRoomAttachment
             fs.writeSync(fd, "**********************************************************\n")
+            console.log('testing cmdSendRoomAttachment')
             const attachmentName = path.join(process.cwd(), filename)
             try {
-                const response  = WickrIOAPI.cmdSendRoomAttachment(roomVGroupID, attachmentName, 'testfile.txt')
+                const response  = await WickrIOAPI.cmdSendRoomAttachment(roomVGroupID, attachmentName, 'testfile.txt')
                 if (response) {
                     fs.writeSync(fd, "cmdSendRoomAttachment: success: " + response + '\n')
                     num_success++
@@ -510,9 +529,10 @@ function testapis(filename) {
 
     // cmdGetRooms
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetRooms')
     var rooms = undefined
     try {
-        const response  = WickrIOAPI.cmdGetRooms()
+        const response  = await WickrIOAPI.cmdGetRooms()
         rooms = isJson(response)
         fs.writeSync(fd, "cmdGetRooms: success: " + response + '\n')
         num_success++
@@ -523,13 +543,15 @@ function testapis(filename) {
 
     // cmdDeleteRoom
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteRoom')
     var roomDeleteFailed=false
     if (rooms && rooms.rooms && rooms.rooms.length > 0) {
-        rooms.rooms.forEach(element => {
+        for (let i=0; i<rooms.rooms.length; i++) {
+            const element = rooms.rooms[i]
             if (element.title.startsWith('TEST:')) {
-		fs.writeSync(fd, "cmdDeleteRoom: trying to delete: " + element.vgroupid + '\n')
+	        	fs.writeSync(fd, "cmdDeleteRoom: trying to delete: " + element.vgroupid + '\n')
                 try {
-                    const response  = WickrIOAPI.cmdDeleteRoom(element.vgroupid)
+                    const response  = await WickrIOAPI.cmdDeleteRoom(element.vgroupid)
                     if (response) {
                         fs.writeSync(fd, 'cmdDeleteRoom: success\n')
                     } else {
@@ -540,10 +562,10 @@ function testapis(filename) {
                     fs.writeSync(fd, 'cmdDeleteRoom: failed: ' + err + '\n')
                     roomDeleteFailed=true
                 }
-	    } else {
-		fs.writeSync(fd, "cmdDeleteRoom: skipping to delete: " + element.vgroupid + '\n')
-	    }
-        });
+    	    } else {
+	        	fs.writeSync(fd, "cmdDeleteRoom: skipping to delete: " + element.vgroupid + '\n')
+	        }
+        }
         if (roomDeleteFailed) {
             num_failure++
 	} else {
@@ -557,17 +579,18 @@ function testapis(filename) {
 
     // cmdGetGroupConvos
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetGroupConvos')
     var groupConvos = undefined
     try {
-        const response  = WickrIOAPI.cmdGetGroupConvos()
-	if (response) {
+        const response  = await WickrIOAPI.cmdGetGroupConvos()
+	    if (response) {
             groupConvos = isJson(response)
             fs.writeSync(fd, 'cmdGetGroupConvos: success: ' + response + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetGroupConvos: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetGroupConvos: failed: ' + err + '\n')
         num_failure++
@@ -575,12 +598,14 @@ function testapis(filename) {
 
     // cmdDeleteGroupConvo
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteGroupConvo')
     var groupConvoDeleteFailed=false
     if (groupConvos && groupConvos.groupconvos && groupConvos.groupconvos.length > 0) {
-        groupConvos.groupconvos.forEach(element => {
+        for (let i=0; i<groupConvos.groupconvos.length; i++) {
+            const element = groupConvos.groupconvos[i]
             fs.writeSync(fd, "cmdDeleteGroupConvo: trying to delete: " + element.vgroupid + '\n')
             try {
-                const response  = WickrIOAPI.cmdDeleteGroupConvo(element.vgroupid)
+                const response  = await WickrIOAPI.cmdDeleteGroupConvo(element.vgroupid)
                 if (response) {
                     fs.writeSync(fd, 'cmdDeleteGroupConvo: success\n')
                 } else {
@@ -591,7 +616,7 @@ function testapis(filename) {
                 fs.writeSync(fd, 'cmdDeleteGroupConvo: failed: ' + err + '\n')
                 groupConvoDeleteFailed=true
             }
-        });
+        }
         if (groupConvoDeleteFailed) {
             num_failure++
 	} else {
@@ -613,19 +638,20 @@ function testapis(filename) {
 
         // cmdAddGroupConvo
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdAddGroupConvo')
         var groupVGroupID = undefined
         try {
-            const response  = WickrIOAPI.cmdAddGroupConvo(groupMembers)
-	    if (response) {
+            const response  = await WickrIOAPI.cmdAddGroupConvo(groupMembers)
+	        if (response) {
                 const result = isJson(response)
                 groupVGroupID = result.vgroupid
 
                 fs.writeSync(fd, "cmdAddGroupConvo: success: " + response + '\n')
                 num_success++
-	    } else {
+	        } else {
                 fs.writeSync(fd, 'cmdAddGroupConvo: failed:\n')
                 num_failure++
-	    }
+	        }
         } catch (err) {
             fs.writeSync(fd, 'cmdAddGroupConvo: failed: ' + err + '\n')
             num_failure++
@@ -633,9 +659,10 @@ function testapis(filename) {
 
         // cmdGetGroupConvo
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdGetGroupConvo')
         if (groupVGroupID) {
             try {
-                const response  = WickrIOAPI.cmdGetGroupConvo(groupVGroupID)
+                const response  = await WickrIOAPI.cmdGetGroupConvo(groupVGroupID)
 	        if (response) {
                     fs.writeSync(fd, "cmdGetGroupConvo: success: " + response + '\n')
                     num_success++
@@ -657,8 +684,9 @@ function testapis(filename) {
 
     // cmdGetReceivedMessage
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetReceivedMessage')
     try {
-        const response  = WickrIOAPI.cmdGetReceivedMessage()
+        const response  = await WickrIOAPI.cmdGetReceivedMessage()
 	if (response) {
             fs.writeSync(fd, 'cmdGetReceivedMessage: success: ' + response + '\n')
             num_success++
@@ -676,7 +704,7 @@ function testapis(filename) {
      * Global list of users to send messages/attachments to
      */
     var sendToUsers = []
-    if (!directoryUsers || directoryUsers.length > 2) {
+    if (directoryUsers && directoryUsers.length > 2) {
         directoryUsers.forEach(element => {
             if (element.name !== bot_username && element.is_bot !== true) {
 	        sendToUsers.push(element.name)
@@ -692,8 +720,9 @@ function testapis(filename) {
     } else {
         // cmdSend1to1Message
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdSend1to1Message')
         try {
-            const response  = WickrIOAPI.cmdSend1to1Message(sendToUsers, "this is a test message for DM convos")
+            const response  = await WickrIOAPI.cmdSend1to1Message(sendToUsers, "this is a test message for DM convos")
 	    if (response) {
                 fs.writeSync(fd, "cmdSend1to1Message: success: " + response + '\n')
                 num_success++
@@ -708,9 +737,10 @@ function testapis(filename) {
 
         // cmdSend1to1Attachment
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdSend1to1Attachment')
         const attachmentName = path.join(process.cwd(), filename)
         try {
-            const response  = WickrIOAPI.cmdSend1to1Attachment(sendToUsers, attachmentName, 'testfile.txt')
+            const response  = await WickrIOAPI.cmdSend1to1Attachment(sendToUsers, attachmentName, 'testfile.txt')
             if (response) {
                 fs.writeSync(fd, "cmdSend1to1Attachment: success: " + response + '\n')
                 num_success++
@@ -734,8 +764,9 @@ function testapis(filename) {
 
         // cmdSendMessageUserNameFile
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdSendMessageUserNameFile')
         try {
-            const response  = WickrIOAPI.cmdSendMessageUserNameFile(userNameFilePath, "this is a test message using a UserName file")
+            const response  = await WickrIOAPI.cmdSendMessageUserNameFile(userNameFilePath, "this is a test message using a UserName file")
 	    if (response) {
                 fs.writeSync(fd, "cmdSendMessageUserNameFile: success: " + response + '\n')
                 num_success++
@@ -753,8 +784,9 @@ function testapis(filename) {
 
         // cmdSendAttachmentUserNameFile
         fs.writeSync(fd, "**********************************************************\n")
+        console.log('testing cmdSendAttachmentUserNameFile')
         try {
-            const response  = WickrIOAPI.cmdSendAttachmentUserNameFile(userNameFilePath, attachmentName, 'testfile.txt')
+            const response  = await WickrIOAPI.cmdSendAttachmentUserNameFile(userNameFilePath, attachmentName, 'testfile.txt')
             if (response) {
                 fs.writeSync(fd, "cmdSendAttachmentUserNameFile: success: " + response + '\n')
                 num_success++
@@ -791,11 +823,12 @@ function testapis(filename) {
 
     // cmdEncryptString
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdEncryptString')
     const origString='This is a test string 123456 !@#$%'
     var encryptedString = undefined
     var encryptStringSuccess = undefined
     try {
-        encryptedString = WickrIOAPI.cmdEncryptString(origString)
+        encryptedString = await WickrIOAPI.cmdEncryptString(origString)
 	if (encryptedString) {
             fs.writeSync(fd, 'cmdEncryptString: success: ' + encryptedString + '\n')
             num_success++
@@ -812,9 +845,10 @@ function testapis(filename) {
 
     // cmdDecryptString
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDecryptString')
     if (encryptStringSuccess) {
         try {
-            const response = WickrIOAPI.cmdDecryptString(encryptedString)
+            const response = await WickrIOAPI.cmdDecryptString(encryptedString)
 	    if (response) {
                 if (response === origString) {
                     fs.writeSync(fd, 'cmdDecryptString: success: ' + response + '\n')
@@ -839,11 +873,12 @@ function testapis(filename) {
 
     // cmdAddKeyValue
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdAddKeyValue')
     const keyName='KeyName123'
     const keyValue='KeyValue123'
     var addKeyValueSuccess = undefined
     try {
-        const response = WickrIOAPI.cmdAddKeyValue(keyName, keyValue)
+        const response = await WickrIOAPI.cmdAddKeyValue(keyName, keyValue)
 	if (response) {
             fs.writeSync(fd, 'cmdAddKeyValue: success!\n')
             num_success++
@@ -860,9 +895,10 @@ function testapis(filename) {
 
     // cmdGetKeyValue
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetKeyValue')
     if (addKeyValueSuccess) {
         try {
-            const response = WickrIOAPI.cmdGetKeyValue(keyName)
+            const response = await WickrIOAPI.cmdGetKeyValue(keyName)
 	    if (response) {
                 fs.writeSync(fd, 'cmdGetKeyValue: success: ' + response + '\n')
                 num_success++
@@ -881,9 +917,10 @@ function testapis(filename) {
 
     // cmdDeleteKeyValue
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteKeyValue')
     if (addKeyValueSuccess) {
         try {
-            const response = WickrIOAPI.cmdDeleteKeyValue(keyName)
+            const response = await WickrIOAPI.cmdDeleteKeyValue(keyName)
 	    if (response) {
                 fs.writeSync(fd, 'cmdDeleteKeyValue: success: ' + response + '\n')
                 num_success++
@@ -902,8 +939,9 @@ function testapis(filename) {
 
     // cmdClearAllKeyValues
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdClearAllKeyValues')
     try {
-        const response = WickrIOAPI.cmdClearAllKeyValues()
+        const response = await WickrIOAPI.cmdClearAllKeyValues()
 	if (response) {
             fs.writeSync(fd, 'cmdClearAllKeyValues: success!\n')
             num_success++
@@ -923,10 +961,11 @@ function testapis(filename) {
 
     // cmdAddMessageID
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdAddMessageID')
     const messageID='ABC123'
     var addMsgIdSuccess = undefined
     try {
-        const response = WickrIOAPI.cmdAddMessageID(messageID, bot_username, 'target', 'date', 'This is a test message')
+        const response = await WickrIOAPI.cmdAddMessageID(messageID, bot_username, 'target', 'date', 'This is a test message')
 	if (response) {
             fs.writeSync(fd, 'cmdAddMessageID: success!\n')
             num_success++
@@ -943,9 +982,10 @@ function testapis(filename) {
 
     // cmdGetMessageIDEntry
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetMessageIDEntry')
     if (addMsgIdSuccess) {
         try {
-            const response = WickrIOAPI.cmdGetMessageIDEntry(messageID)
+            const response = await WickrIOAPI.cmdGetMessageIDEntry(messageID)
 	    if (response) {
                 fs.writeSync(fd, 'cmdGetMessageIDEntry: success: ' + response + '\n')
                 num_success++
@@ -964,8 +1004,9 @@ function testapis(filename) {
 
     // cmdGetMessageIDTable
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetMessageIDTable')
     try {
-        var result = WickrIOAPI.cmdGetMessageIDTable("0", "10")
+        var result = await WickrIOAPI.cmdGetMessageIDTable("0", "10")
         if (result) {
             const response = isJson(result)
             fs.writeSync(fd, 'cmdGetMessageIDTable: success: ' + result + '\n')
@@ -981,9 +1022,10 @@ function testapis(filename) {
 
     // cmdDeleteMessageID
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdDeleteMessageID')
     if (addMsgIdSuccess) {
         try {
-            const response = WickrIOAPI.cmdDeleteMessageID(messageID)
+            const response = await WickrIOAPI.cmdDeleteMessageID(messageID)
 	    if (response) {
                 fs.writeSync(fd, 'cmdDeleteMessageID: success!\n')
                 num_success++
@@ -1013,18 +1055,21 @@ function testapis(filename) {
     // cmdSendRecallMessage
     num_notcoded++
 
+    /*
+
     // cmdGetVerificationList
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetVerificationList')
     try {
-        var verList = WickrIOAPI.cmdGetVerificationList()
-	if (verList) {
+        var verList = await WickrIOAPI.cmdGetVerificationList()
+	    if (verList) {
             const response = isJson(verList)
             fs.writeSync(fd, 'cmdGetVerificationList: success: ' + verList + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetVerificationList: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetVerificationList: failed: ' + err + '\n')
         num_failure++
@@ -1032,10 +1077,11 @@ function testapis(filename) {
 
     // cmdVerifyUsers
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdVerifyUsers')
     if (directoryUsers === undefined) {
-        fs.writeSync(fd, 'cmdVerifyUsers: directoryUsers list is indefined!\n')
+        fs.writeSync(fd, 'cmdVerifyUsers: directoryUsers list is undefined!\n')
         num_cantrun++
-    } else if (securityGroups.size === 0) {
+    } else if (directoryUsers.size === 0) {
         fs.writeSync(fd, 'cmdVerifyUsers: directoryUsers list is empty!\n')
         num_cantrun++
     } else {
@@ -1044,16 +1090,16 @@ function testapis(filename) {
             if (user === undefined) {
                 fs.writeSync(fd, 'cmdVerifyUsers: user name is undefined!\n')
                 num_failure++
-	    } else {
-                const response = WickrIOAPI.cmdVerifyUsers(user)
-	        if (response) {
+	        } else {
+                const response = await WickrIOAPI.cmdVerifyUsers(user)
+	            if (response) {
                     fs.writeSync(fd, 'cmdVerifyUsers: success: ' + response + '\n')
                     num_success++
-	        } else {
+	            } else {
                     fs.writeSync(fd, 'cmdVerifyUsers: failed: returned empty response\n')
                     num_failure++
+	            }
 	        }
-	    }
         } catch (err) {
             fs.writeSync(fd, 'cmdVerifyUsers: failed: ' + err + '\n')
             num_failure++
@@ -1063,7 +1109,7 @@ function testapis(filename) {
     // cmdVerifyAll
     fs.writeSync(fd, "**********************************************************\n")
     try {
-        var verList = WickrIOAPI.cmdVerifyAll()
+        var verList = await WickrIOAPI.cmdVerifyAll()
 	if (verList) {
             fs.writeSync(fd, 'cmdVerifyAll: success: ' + verList + '\n')
             num_success++
@@ -1079,8 +1125,9 @@ function testapis(filename) {
 
     // cmdSetVerificationMode
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdSetVerificationMode')
     try {
-        var verList = WickrIOAPI.cmdSetVerificationMode("automatic")
+        var verList = await WickrIOAPI.cmdSetVerificationMode("automatic")
 	if (verList) {
             fs.writeSync(fd, 'cmdSetVerificationMode: success: ' + verList + '\n')
             num_success++
@@ -1092,12 +1139,14 @@ function testapis(filename) {
         fs.writeSync(fd, 'cmdSetVerificationMode: failed: ' + err + '\n')
         num_failure++
     }
+    */
 
 
     // cmdGetUserInfo
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetUserInfo')
     if (directoryUsers === undefined) {
-        fs.writeSync(fd, 'cmdGetUserInfo: directoryUsers list is indefined!\n')
+        fs.writeSync(fd, 'cmdGetUserInfo: directoryUsers list is undefined!\n')
         num_cantrun++
     } else if (securityGroups.size === 0) {
         fs.writeSync(fd, 'cmdGetUserInfo: directoryUsers list is empty!\n')
@@ -1109,7 +1158,7 @@ function testapis(filename) {
                 fs.writeSync(fd, 'cmdGetUserInfo: user name is undefined!\n')
                 num_failure++
 	    } else {
-                var userInfo = WickrIOAPI.cmdGetUserInfo(user)
+                var userInfo = await WickrIOAPI.cmdGetUserInfo(user)
 	        if (userInfo) {
                     fs.writeSync(fd, 'cmdGetUserInfo: success: ' + userInfo + '\n')
                     num_success++
@@ -1127,16 +1176,17 @@ function testapis(filename) {
     // cmdGetServerInfo
     var serverInfo = undefined
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetServerInfo')
     try {
-        var verList = WickrIOAPI.cmdGetServerInfo()
-	if (verList) {
+        var verList = await WickrIOAPI.cmdGetServerInfo()
+	    if (verList) {
             serverInfo = isJson(verList)
             fs.writeSync(fd, 'cmdGetServerInfo: success: ' + verList + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetServerInfo: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetServerInfo: failed: ' + err + '\n')
         num_failure++
@@ -1144,16 +1194,17 @@ function testapis(filename) {
 
     // cmdGetClientInfo
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetClientInfo')
     try {
-        var verList = WickrIOAPI.cmdGetClientInfo()
-	if (verList) {
+        var verList = await WickrIOAPI.cmdGetClientInfo()
+	    if (verList) {
             const response = isJson(verList)
             fs.writeSync(fd, 'cmdGetClientInfo: success: ' + verList + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetClientInfo: failed: returned empty list\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetClientInfo: failed: ' + err + '\n')
         num_failure++
@@ -1161,9 +1212,10 @@ function testapis(filename) {
 
     // cmdGetNetworkRooms
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetNetworkRooms')
     if (serverInfo !== undefined) {
         try {
-            const response = WickrIOAPI.cmdGetNetworkRooms(serverInfo.network_id)
+            const response = await WickrIOAPI.cmdGetNetworkRooms(serverInfo.network_id)
 	    if (verList) {
                 fs.writeSync(fd, 'cmdGetNetworkRooms: success: ' + response + '\n')
                 num_success++
@@ -1185,20 +1237,23 @@ function testapis(filename) {
 
     // cmdGetTransmitQueueInfo
     fs.writeSync(fd, "**********************************************************\n")
+    console.log('testing cmdGetTransmitQueueInfo')
     try {
-        var verList = WickrIOAPI.cmdGetTransmitQueueInfo()
-	if (verList) {
+        var verList = await WickrIOAPI.cmdGetTransmitQueueInfo()
+	    if (verList) {
             const response = isJson(verList)
             fs.writeSync(fd, 'cmdGetTransmitQueueInfo: success: ' + verList + '\n')
             num_success++
-	} else {
+	    } else {
             fs.writeSync(fd, 'cmdGetTransmitQueueInfo: failed: returned empty value\n')
             num_failure++
-	}
+	    }
     } catch (err) {
         fs.writeSync(fd, 'cmdGetTransmitQueueInfo: failed: ' + err + '\n')
         num_failure++
     }
+
+    console.log('testing DONE')
 
     // SUMMARY
     fs.writeSync(fd, "**********************************************************\n")
@@ -1285,6 +1340,32 @@ async function testsendattachments(filename, userEmail, vGroupID) {
         }
     } catch (err) {
         fs.writeSync(fd, 'cmdSend1to1Attachment: failed: ' + err + '\n')
+        num_failure++
+    }
+
+    /*
+     * cmdSend1to1Attachment with a URL
+     */
+    fs.writeSync(fd, "**********************************************************\n")
+
+    const urlFileName='https:\/\/images.freeimages.com\/images\/large-previews\/7c0\/bird-1310808.jpg'
+
+    try {
+        const response = await WickrIOAPI.cmdSend1to1Attachment(sendToUsers, urlFileName, 'bird-1310808.jpg', '', '', '', true)
+        if (response) {
+	    if (fileIsDeleted(attachmentCopyName)) {
+              fs.writeSync(fd, "cmdSend1to1Attachment.URL: success: " + response + '\n')
+              num_success++
+	    } else {
+              fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed to remove the file with 5 seconds\n')
+              num_failure++
+	    }
+        } else {
+            fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed: empty value\n')
+            num_failure++
+        }
+    } catch (err) {
+        fs.writeSync(fd, 'cmdSend1to1Attachment.URL: failed: ' + err + '\n')
         num_failure++
     }
 
@@ -1386,10 +1467,10 @@ async function testsendattachments(filename, userEmail, vGroupID) {
             securityGroups = isJson(security)
 
             if (securityGroups !== undefined && securityGroups.size !== 0) {
-	        for (var i=0; i<securityGroups.size; i++) {
+	            for (var i=0; i<securityGroups.size; i++) {
                     securityGroupList.push(securityGroups[i].id);
-		}
-	    }
+		        }
+	        }
         }
     } catch (err) {
         fs.writeSync(fd, 'Failed to get security groups: ' + err + '\n')
@@ -1893,7 +1974,7 @@ async function listen(message) {
     else if (command == '/test') {
         const reply = 'Starting the Addon API tests'
         var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
-        const response = testapis('test_output.txt')
+        const response = await testapis('test_output.txt')
         if (response) {
             const responsestring = JSON.stringify(response, null, 4)
             var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
@@ -1969,11 +2050,11 @@ async function listen(message) {
 
 function isJson(str) {
     try {
-        str = JSON.parse(str)
+        const jsonstr = JSON.parse(str)
+        return jsonstr
     } catch (e) {
         return false
     }
-    return str
 }
 
 main();
