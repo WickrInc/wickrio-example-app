@@ -10,9 +10,9 @@ if [ -n "$1" ]; then
   fi
 fi
 
-if [ -f "/usr/local/nvm/nvm.sh" ]; then
-  . /usr/local/nvm/nvm.sh
-  nvm use 18
-fi
+# if [ -f "/usr/local/nvm/nvm.sh" ]; then
+#   . /usr/local/nvm/nvm.sh
+#   nvm use 18
+# fi
 
 node configure.js $CLIENT_NAME
