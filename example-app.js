@@ -77,6 +77,7 @@ async function main() {
 
     // The following call passes a callback function to the bot API. 
     // The listen function will be called for each message received.
+    console.log("starting to listen")
     await bot.startListening(listen);
 
   } catch (err) {
@@ -366,21 +367,21 @@ async function testapis(filename) {
         num_failure++
     }
 
-    /*
-     * Room APIs
-     */
+//     /*
+//      * Room APIs
+//      */
     // We must have a list of users to proceed with these tests!
     if (!directoryUsers || directoryUsers.length < 2) {
         fs.writeSync(fd, "**********************************************************\n")
-        fs.writeSync(fd, 'Not enought directory users to run Room tests!\n')
+        fs.writeSync(fd, 'Not enoughh directory users to run Room tests!\n')
         num_cantrun += 5
     } else {
         // Room value setup
 //        var roomMembers = [bot_username, directoryUsers[0].name ]
         //var roomModerators = [bot_username, directoryUsers[0].name ]
-        var roomMembers = [bot_username]
+        var roomMembers = [bot_username, directoryUsers[0].name ]
         var roomModerators = [bot_username]
-
+    }
         // cmdAddRoom
         fs.writeSync(fd, "**********************************************************\n")
         console.log('testing cmdAddRoom')
@@ -390,7 +391,6 @@ async function testapis(filename) {
 	        if (response) {
                 const result = isJson(response)
                 roomVGroupID = result.vgroupid
-
                 fs.writeSync(fd, "cmdAddRoom: success: " + response + '\n')
                 num_success++
 	        } else {
@@ -459,6 +459,10 @@ async function testapis(filename) {
 	            if (response) {
                     const getResponse  = await WickrIOAPI.cmdGetRoom(roomVGroupID)
                     const getResult = isJson(getResponse)
+
+                    console.log("response from get: ", getResult)
+
+
                     if (getResult.members.length === newRoomMembers.length && getResult.masters.length === newRoomModerators.length) {
                         fs.writeSync(fd, "cmdModifyRoom: modify members/moderators success: " + response + '\n')
                         num_success++
@@ -474,7 +478,8 @@ async function testapis(filename) {
                 fs.writeSync(fd, 'cmdModifyRoom: modify members/moderators failed: ' + err + '\n')
                 num_failure++
             }
-	} else {
+        }
+	 else {
             fs.writeSync(fd, 'cmdModifyRoom: room was not added or now VGroupID!\n')
             num_cantrun += 2
 	}
@@ -525,7 +530,6 @@ async function testapis(filename) {
 
         // cmdLeaveRoom
         num_notcoded++
-    }
 
     // cmdGetRooms
     fs.writeSync(fd, "**********************************************************\n")
@@ -634,7 +638,7 @@ async function testapis(filename) {
         num_cantrun += 3
     } else {
         // Group value setup
-        var groupMembers = [bot_username, directoryUsers[0].name ]
+        var groupMembers = [bot_username, directoryUsers[0].name]
 
         // cmdAddGroupConvo
         fs.writeSync(fd, "**********************************************************\n")
@@ -656,6 +660,7 @@ async function testapis(filename) {
             fs.writeSync(fd, 'cmdAddGroupConvo: failed: ' + err + '\n')
             num_failure++
         }
+    }
 
         // cmdGetGroupConvo
         fs.writeSync(fd, "**********************************************************\n")
@@ -679,7 +684,6 @@ async function testapis(filename) {
             num_cantrun++
 	}
 
-    }
 
 
     // cmdGetReceivedMessage
@@ -698,6 +702,7 @@ async function testapis(filename) {
         fs.writeSync(fd, 'cmdGetReceivedMessage: failed: ' + err + '\n')
         num_failure++
     }
+
 
 
     /*
@@ -845,9 +850,9 @@ async function testapis(filename) {
 
     // cmdDecryptString
     fs.writeSync(fd, "**********************************************************\n")
-    console.log('testing cmdDecryptString')
     if (encryptStringSuccess) {
         try {
+            console.log("Encrypted string:", encryptedString)
             const response = await WickrIOAPI.cmdDecryptString(encryptedString)
 	    if (response) {
                 if (response === origString) {
@@ -1055,7 +1060,6 @@ async function testapis(filename) {
     // cmdSendRecallMessage
     num_notcoded++
 
-    /*
 
     // cmdGetVerificationList
     fs.writeSync(fd, "**********************************************************\n")
@@ -1139,7 +1143,7 @@ async function testapis(filename) {
         fs.writeSync(fd, 'cmdSetVerificationMode: failed: ' + err + '\n')
         num_failure++
     }
-    */
+   
 
 
     // cmdGetUserInfo
@@ -1973,17 +1977,17 @@ async function listen(message) {
      */
     else if (command == '/test') {
         const reply = 'Starting the Addon API tests'
-        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
+        var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, reply, "", "", "", [], "");
         const response = await testapis('test_output.txt')
         if (response) {
             const responsestring = JSON.stringify(response, null, 4)
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage =  await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 
             const filename = path.join(process.cwd(), 'test_output.txt')
-            var sFileMessage = WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_output.txt', "", "", []);
+            var sFileMessage = await WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_output.txt', "", "", []);
         } else {
             const responsestring = 'Received invalid response from the test function!'
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
         }
     }
     else if (command == '/sendtest') {
