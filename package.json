@@ -1,11 +1,11 @@
 {
   "name": "wickrio-example-app",
-  "version": "6.38.1",
+  "version": "6.46.1",
   "description": "WickrIO Node.js API example app",
   "main": "example-app.js",
   "dependencies": {
     "prompt": "^1.3.0",
-    "wickrio-bot-api": "7.1.1-beta.02"
+    "wickrio-bot-api": "7.1.x"
   },
   "scripts": {
     "start": "forever start -m 5 ./forever.json",
