@@ -460,9 +460,6 @@ async function testapis(filename) {
                     const getResponse  = await WickrIOAPI.cmdGetRoom(roomVGroupID)
                     const getResult = isJson(getResponse)
 
-                    console.log("response from get: ", getResult)
-
-
                     if (getResult.members.length === newRoomMembers.length && getResult.masters.length === newRoomModerators.length) {
                         fs.writeSync(fd, "cmdModifyRoom: modify members/moderators success: " + response + '\n')
                         num_success++
@@ -489,12 +486,10 @@ async function testapis(filename) {
         if (!roomVGroupID) {
             fs.writeSync(fd, "**********************************************************\n")
             fs.writeSync(fd, 'No VGroupID to send message tests!\n')
-	    console.log('roomVGroupID=' + roomVGroupID)
             num_cantrun += 3
         } else {
             // cmdSendRoomMessage
             fs.writeSync(fd, "**********************************************************\n")
-            console.log('testing cmdSendRoomMessage')
             try {
                 const response  = await WickrIOAPI.cmdSendRoomMessage(roomVGroupID, "this is a test message for Room convos")
 	        if (response) {
@@ -1997,36 +1992,36 @@ async function listen(message) {
         const response = await testsendattachments('test_send_attachment_output.txt', userEmail, vGroupID);
         if (response) {
             const responsestring = JSON.stringify(response, null, 4)
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 
             const filename = path.join(process.cwd(), 'test_send_attachment_output.txt')
-            var sFileMessage = WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_send_attachment_output.txt', "", "", '', true);
+            var sFileMessage = await WickrIOAPI.cmdSendRoomAttachment(vGroupID, filename, 'test_send_attachment_output.txt', "", "", '', true);
         } else {
             const responsestring = 'Received invalid response from the testsendattachments function!'
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
         }
     }
     else if (command == '/rooms') {
-        const rooms = WickrIOAPI.cmdGetRooms();
+        const rooms = await WickrIOAPI.cmdGetRooms();
         const obj = JSON.parse(rooms);
 
         const responsestring = JSON.stringify(rooms, null, 4)
-        var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+        var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
     }
     else if (command == '/sendrooms') {
-        const rooms = WickrIOAPI.cmdGetRooms();
+        const rooms = await WickrIOAPI.cmdGetRooms();
         const obj = JSON.parse(rooms);
 
         console.log('obj=', obj);
         const arrayLength = obj.rooms.length;
         console.log('rooms length=', arrayLength);
-        var sMessage2 = WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
+        var sMessage2 = await WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
         for (var i = 0; i < arrayLength; i++) {
             console.log(obj.rooms[i].vgroupid);
             const responsestring= 'Send message to room with VgroupID ' + obj.rooms[i].vgroupid;
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, argument, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, argument, "", "", "", [], "");
         }
     }
     else if (command == '/demo') {
@@ -2038,13 +2033,13 @@ async function listen(message) {
         //console.log('obj=', obj);
         const arrayLength = obj.rooms.length;
         //console.log('rooms length=', arrayLength);
-        var sMessage2 = WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
+        var sMessage2 = await WickrIOAPI.cmdSendRoomMessage(vGroupID, "In send2rooms", "", "", "", [], "");
         for (var i = 0; i < arrayLength; i++) {
             //console.log(obj.rooms[i].vgroupid);
             const responsestring= 'Send demo conten to room with VgroupID ' + obj.rooms[i].vgroupid;
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(vGroupID, responsestring, "", "", "", [], "");
 
-            var sMessage = WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, democontent, "", "", "", [], "");
+            var sMessage = await WickrIOAPI.cmdSendRoomMessage(obj.rooms[i].vgroupid, democontent, "", "", "", [], "");
         }
     }
   } catch (err) {
