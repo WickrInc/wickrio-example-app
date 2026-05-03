@@ -1,0 +1,13 @@
+{
+  "apps" : [{
+    "name": "WickrIO-Example-App",
+    "script": "./example-app.js",
+    "instances": 1,
+    "max_memory_restart": "1G",
+    "node_args": [],
+    "env": {
+      "NODE_ENV": "production"
+    },
+    "args": []
+  }]
+}
